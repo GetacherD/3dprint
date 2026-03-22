@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "products")
 public class Product {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +28,7 @@ public class Product {
 
     private BigDecimal price;
 
+
     private Integer stockQuantity;
 
     private String imageUrl;
@@ -34,4 +36,7 @@ public class Product {
     private LocalDateTime createdAt;
     @ElementCollection
     private List<String> imageUrls;
+
+
+
 }
