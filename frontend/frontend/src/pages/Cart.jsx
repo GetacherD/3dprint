@@ -73,7 +73,7 @@ export default function Cart() {
                 {/* LEFT */}
                 <Group>
                   <Image
-                    src={`http://localhost:8080${item.imageUrl}`}
+                    src={`${item.imageUrl}`}
                     width={60}
                     height={60}
                     radius="md"

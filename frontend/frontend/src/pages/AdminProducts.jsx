@@ -158,7 +158,7 @@ export default function AdminProducts() {
                 <Table.Tr key={p.id}>
                   <Table.Td>
                     <Image
-                      src={`http://localhost:8080${p.imageUrl}`}
+                      src={`${p.imageUrl}`}
                       width={60}
                       height={60}
                     />
@@ -191,7 +191,7 @@ export default function AdminProducts() {
             {selected?.imageUrls?.map((img, i) => (
               <div key={i} style={{ position: "relative" }}>
                 <Image
-                  src={`http://localhost:8080${img}`}
+                  src={`${img}`}
                   width={80}
                   height={80}
                 />

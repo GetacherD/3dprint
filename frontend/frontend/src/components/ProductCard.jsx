@@ -43,7 +43,7 @@ export default function ProductCard({ product }) {
     >
       <Card.Section>
         <Image
-          src={`http://localhost:8080${product.imageUrl}`}
+          src={`${product.imageUrl}`}
           height={180}
           fit="cover"
         />

@@ -256,7 +256,7 @@ export default function ProductDetail() {
                       }}
                     >
                       <Image
-                        src={`http://localhost:8080${img}`}
+                        src={`${img}`}
                         style={{
                           maxWidth: "100%",
                           maxHeight: "100%",
@@ -286,7 +286,7 @@ export default function ProductDetail() {
                 style={{
                   width: "100%",
                   height: "100%",
-                  backgroundImage: `url(http://localhost:8080${images[activeIndex]})`,
+                  backgroundImage: `url(${images[activeIndex]})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "180%",
                   backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
