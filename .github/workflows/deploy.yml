@@ -1,0 +1,35 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            echo "=== PULL LATEST CODE ==="
+            cd ~/workspace/3dprint/
+            git pull
+
+            echo "=== FRONTEND DEPLOY ==="
+            cd ~/workspace/3dprint/frontend/frontend/
+            npm install
+            npm run build
+            sudo cp -r dist/* /var/www/frontend/
+            sudo systemctl restart nginx.service
+
+            echo "=== BACKEND DEPLOY ==="
+            cd ~/workspace/3dprint/backend/threedprint/
+            ./mvnw clean package -DskipTests
+            sudo systemctl restart threedprint.service
