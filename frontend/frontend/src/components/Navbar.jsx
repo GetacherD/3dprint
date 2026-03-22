@@ -33,14 +33,14 @@ export default function Navbar() {
         style={{ cursor: "pointer" }}
         onClick={() => navigate("/")}
       >
-        3D Printing Products Market Place, TMT
+        3D Printing Products Market Place
       </Text>
 
       <Group>
 
         {/* 🌍 EXPLORE */}
         <Button variant="subtle" onClick={() => navigate("/")}>
-          Explore
+          Home
         </Button>
 
         {/* 🛒 CART */}
@@ -89,7 +89,9 @@ export default function Navbar() {
             </Button>
           </>
         )}
-
+      <Button variant="subtle" onClick={() => {alert("For demo purposes, please contact the developer at: \n\nEmail: developer@example.com")}}>
+          Contact Us
+        </Button>
       </Group>
     </Container>
   );
