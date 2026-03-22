@@ -33,7 +33,7 @@ export default function Navbar() {
         style={{ cursor: "pointer" }}
         onClick={() => navigate("/")}
       >
-        3D Printing Products Market Place
+        3D Printing Products Market Place, TMT
       </Text>
 
       <Group>

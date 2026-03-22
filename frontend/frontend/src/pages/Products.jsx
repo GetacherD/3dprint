@@ -73,7 +73,7 @@ export default function Products() {
       >
         <Container size="lg">
           <Stack gap="xs">
-            <Title order={1}>3D Printing Marketplace</Title>
+            <Title order={1}>3D Printing Marketplace TMT</Title>
             <Text size="lg">
               Explore products freely. Login only when you're ready to buy.
             </Text>
