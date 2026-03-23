@@ -3,7 +3,9 @@ package com.getacher.threedprint.product.service.Impl;
 import com.getacher.threedprint.common.exception.AppException;
 import com.getacher.threedprint.product.dto.ProductRequest;
 import com.getacher.threedprint.product.dto.ProductResponse;
+import com.getacher.threedprint.product.entity.Category;
 import com.getacher.threedprint.product.entity.Product;
+import com.getacher.threedprint.product.repository.CategoryRepository;
 import com.getacher.threedprint.product.repository.ProductRepository;
 import com.getacher.threedprint.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,14 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
+    private final CategoryRepository categoryRepository;
 
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Category not found"));
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -39,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
                 .imageUrl(request.getImageUrl())
                 .createdAt(LocalDateTime.now())
                 .imageUrls(request.getImageUrls())
+                .category(category)
                 .build();
 
         Product saved = productRepository.save(product);
@@ -50,6 +56,10 @@ public class ProductServiceImpl implements ProductService {
                 .price(saved.getPrice())
                 .stockQuantity(saved.getStockQuantity())
                 .imageUrl(saved.getImageUrl())
+                .categoryName(saved.getCategory().getName())
+                .categoryId(
+                        saved.getCategory() != null ? product.getCategory().getId() : null
+                )
                 .build();
     }
 
@@ -98,7 +108,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse updateProduct(Long id, ProductRequest request) {
-
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Category not found"));
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Product not found"));
 
@@ -108,6 +119,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStockQuantity(request.getStockQuantity());
         product.setImageUrl(request.getImageUrl());
         product.setImageUrls(request.getImageUrls());
+        product.setCategory(category);
         Product updated = productRepository.save(product);
 
         return mapToResponse(updated);
@@ -158,6 +170,10 @@ public class ProductServiceImpl implements ProductService {
                 .stockQuantity(product.getStockQuantity())
                 .imageUrl(product.getImageUrl())
                 .imageUrls(product.getImageUrls())
+                .categoryName(product.getCategory()!= null? product.getCategory().getName():null)
+                .categoryId(
+                        product.getCategory() != null ? product.getCategory().getId() : null
+                )
                 .build();
     }
 }

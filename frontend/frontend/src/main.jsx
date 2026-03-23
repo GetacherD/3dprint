@@ -18,7 +18,26 @@ createRoot(document.getElementById("root")).render(
         defaultRadius: "md",
       }}
     >
-       <Notifications position="top-right"  zIndex={10000}/>
+       <Notifications
+  position="top-center"
+  zIndex={10000}
+  autoClose={3000}
+  containerWidth={500}
+  notificationProps={{
+    radius: "lg",
+    withBorder: true,
+    p: "lg",
+  }}
+  styles={{
+    title: {
+      fontSize: "30px",
+      fontWeight: 900,
+    },
+    description: {
+      fontSize: "20px",
+    },
+  }}
+/>
       <CartProvider>
     <App />
   </CartProvider>

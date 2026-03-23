@@ -38,5 +38,7 @@ public class Product {
     private List<String> imageUrls;
 
 
-
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

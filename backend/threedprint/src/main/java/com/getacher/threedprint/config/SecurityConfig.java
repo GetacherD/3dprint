@@ -53,6 +53,12 @@ public class SecurityConfig {
                                 "/api/products/**"
                         ).permitAll()
 
+
+                        ///api/categories
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
                         // 🌍 PUBLIC CONTENT (READ)
                         .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
 

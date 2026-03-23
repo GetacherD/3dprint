@@ -27,4 +27,5 @@ public class ProductRequest {
 
     private String imageUrl;
     private List<String> imageUrls;
+    private Long categoryId;
 }

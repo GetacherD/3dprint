@@ -9,6 +9,8 @@ import {
   TextInput,
   NumberInput,
   Group,
+  Button,
+  Badge, // 🔥 NEW
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
@@ -25,6 +27,9 @@ export default function Products() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
+  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState("");
+
   const [heroTitle, setHeroTitle] = useState("");
   const [heroDesc, setHeroDesc] = useState("");
 
@@ -34,6 +39,10 @@ export default function Products() {
       setProducts(data);
       setFiltered(data);
       setLoading(false);
+    });
+
+    api.get("/api/categories").then((res) => {
+      setCategories(res.data);
     });
 
     api.get("/api/content/hero_title")
@@ -47,7 +56,12 @@ export default function Products() {
       );
   }, []);
 
-  const applyFilter = (searchValue, min, max) => {
+  // 🔥 COUNT PER CATEGORY
+  const getCategoryCount = (categoryName) => {
+    return products.filter((p) => p.categoryName === categoryName).length;
+  };
+
+  const applyFilter = (searchValue, min, max, categoryValue) => {
     let result = [...products];
 
     if (searchValue) {
@@ -64,45 +78,44 @@ export default function Products() {
       result = result.filter((p) => p.price <= Number(max));
     }
 
+    if (categoryValue) {
+      result = result.filter(
+        (p) => p.categoryName === categoryValue
+      );
+    }
+
     setFiltered(result);
   };
 
   const debouncedSearch = debounce((value) => {
-    applyFilter(value, minPrice, maxPrice);
+    applyFilter(value, minPrice, maxPrice, category);
   }, 300);
 
   return (
     <>
-      {/* 🔥 HERO (RESPONSIVE) */}
+      {/* HERO */}
       <Box
         style={{
           background: "linear-gradient(135deg, #4c6ef5, #15aabf)",
           color: "white",
-          padding: "60px 16px", // 🔥 smaller padding mobile
+          padding: "60px 16px",
           marginBottom: "24px",
         }}
       >
         <Container size="lg">
           <Stack gap="xs">
-            <Title
-              fw={800}
-              style={{
-                fontSize: "clamp(24px, 5vw, 40px)", // 🔥 responsive font
-                lineHeight: 1.2,
-              }}
-            >
+            <Title fw={800} style={{ fontSize: "clamp(24px, 5vw, 40px)" }}>
               {heroTitle || "3D Printing Marketplace"}
             </Title>
 
             <Text size="sm" style={{ opacity: 0.9 }}>
-              {heroDesc ||
-                "Discover high-quality 3D printed products. Simple, fast, and reliable."}
+              {heroDesc}
             </Text>
           </Stack>
         </Container>
       </Box>
 
-      {/* 🔥 FILTER BAR */}
+      {/* FILTER */}
       <Container size="lg" mb="lg">
         <Box
           style={{
@@ -112,12 +125,12 @@ export default function Products() {
             boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
           }}
         >
-          {/* 🔥 MOBILE STACK / DESKTOP ROW */}
           <Stack gap="sm">
+
+            {/* SEARCH */}
             <TextInput
               placeholder="Search products..."
               leftSection={<IconSearch size={16} />}
-              radius="md"
               value={search}
               onChange={(e) => {
                 const value = e.target.value;
@@ -126,44 +139,73 @@ export default function Products() {
               }}
             />
 
+            {/* 🔥 CATEGORY PILLS WITH COUNT */}
+            <Group wrap="nowrap" style={{ overflowX: "auto" }}>
+              <Button
+                variant={category === "" ? "filled" : "light"}
+                onClick={() => {
+                  setCategory("");
+                  applyFilter(search, minPrice, maxPrice, "");
+                }}
+              >
+                All
+                <Badge ml={6}>{products.length}</Badge>
+              </Button>
+
+              {categories.map((c) => {
+                const count = getCategoryCount(c.name);
+
+                return (
+                  <Button
+                    key={c.id}
+                    variant={category === c.name ? "filled" : "light"}
+                    onClick={() => {
+                      setCategory(c.name);
+                      applyFilter(search, minPrice, maxPrice, c.name);
+                    }}
+                  >
+                    {c.name}
+                    <Badge ml={6}>{count}</Badge>
+                  </Button>
+                );
+              })}
+            </Group>
+
+            {/* PRICE */}
             <Group grow>
               <NumberInput
                 placeholder="Min Price"
-                radius="md"
                 value={minPrice}
                 onChange={(value) => {
                   setMinPrice(value);
-                  applyFilter(search, value, maxPrice);
+                  applyFilter(search, value, maxPrice, category);
                 }}
               />
 
               <NumberInput
                 placeholder="Max Price"
-                radius="md"
                 value={maxPrice}
                 onChange={(value) => {
                   setMaxPrice(value);
-                  applyFilter(search, minPrice, value);
+                  applyFilter(search, minPrice, value, category);
                 }}
               />
             </Group>
+
           </Stack>
         </Box>
       </Container>
 
-      {/* 🔥 TITLE FIX (inside container) */}
       <Container size="lg">
-        <Title order={3} mb="md">
-          Products
-        </Title>
+        <Title order={3} mb="md">Products</Title>
       </Container>
 
-      {/* 🔥 PRODUCTS */}
+      {/* PRODUCTS */}
       <Container size="lg">
         {loading ? (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }}>
             {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} height={250} radius="md" />
+              <Skeleton key={i} height={250} />
             ))}
           </SimpleGrid>
         ) : filtered.length === 0 ? (

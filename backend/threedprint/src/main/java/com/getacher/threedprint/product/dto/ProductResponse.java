@@ -19,4 +19,6 @@ public class ProductResponse {
     private Integer stockQuantity;
     private String imageUrl;
     private List<String> imageUrls;
+    private String categoryName;
+    private Long categoryId;
 }

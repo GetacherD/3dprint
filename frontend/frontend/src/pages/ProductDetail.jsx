@@ -33,15 +33,13 @@ export default function ProductDetail() {
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  // 🔥 ZOOM (UNCHANGED)
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [activeIndex, setActiveIndex] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
 
-  // 🔥 CART FEEDBACK (UNCHANGED)
   const [added, setAdded] = useState(false);
 
-  // 🔥 REVIEW STATE
   const [reviews, setReviews] = useState([]);
   const [myReview, setMyReview] = useState(null);
   const [rating, setRating] = useState(0);
@@ -136,6 +134,10 @@ export default function ProductDetail() {
       });
 
       loadData();
+
+      // 🔥 AUTO SCROLL
+      reviewRef.current.scrollIntoView({ behavior: "smooth" });
+
     } catch (err) {
       notifications.show({
         title: "Error",
@@ -146,27 +148,11 @@ export default function ProductDetail() {
   };
 
   const handleDeleteReview = async () => {
-    try {
-      await api.delete(`/api/reviews/${myReview.id}`);
-
-      notifications.show({
-        title: "Deleted",
-        message: "Review removed",
-        color: "red",
-      });
-
-      setMyReview(null);
-      setRating(0);
-      setComment("");
-
-      loadData();
-    } catch {
-      notifications.show({
-        title: "Error",
-        message: "Failed to delete review",
-        color: "red",
-      });
-    }
+    await api.delete(`/api/reviews/${myReview.id}`);
+    setMyReview(null);
+    setRating(0);
+    setComment("");
+    loadData();
   };
 
   if (!product) {
@@ -185,17 +171,17 @@ export default function ProductDetail() {
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === images.length - 1;
 
-  // 🔥 SORTED REVIEWS
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+      : 0;
+
+  const outOfStock = product.stockQuantity === 0;
+
   const sortedReviews = [...reviews].sort((a, b) => {
-    if (sort === "newest") {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-    if (sort === "highest") {
-      return b.rating - a.rating;
-    }
-    if (sort === "lowest") {
-      return a.rating - b.rating;
-    }
+    if (sort === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sort === "highest") return b.rating - a.rating;
+    if (sort === "lowest") return a.rating - b.rating;
     return 0;
   });
 
@@ -203,23 +189,19 @@ export default function ProductDetail() {
     <Container size="lg" my="xl">
       <Grid gutter="xl">
 
-        {/* LEFT IMAGE */}
+        {/* IMAGE */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Paper shadow="md" radius="lg" p="sm" withBorder>
 
             <div
+              onClick={() => setFullscreen(!fullscreen)}
               style={{
                 width: "100%",
                 aspectRatio: "1 / 1",
+                height: fullscreen ? "80vh" : "auto",
                 position: "relative",
                 overflow: "hidden",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "white",
-                borderRadius: "12px",
-
-
+                cursor: "zoom-in",
               }}
               onMouseEnter={() => setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
@@ -227,7 +209,6 @@ export default function ProductDetail() {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
-
                 setZoomPos({ x, y });
               }}
             >
@@ -248,26 +229,13 @@ export default function ProductDetail() {
                   },
                 }}
               >
-                {images.map((img, index) => (
-                  <Carousel.Slide key={index}>
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Image
-                        src={`${img}`}
-                        style={{
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
-                    </div>
+                {images.map((img, i) => (
+                  <Carousel.Slide key={i}>
+                    <Image
+                      src={img || undefined}
+                      fit="contain"
+                      style={{ maxHeight: "100%" }}
+                    />
                   </Carousel.Slide>
                 ))}
               </Carousel>
@@ -276,119 +244,102 @@ export default function ProductDetail() {
           </Paper>
         </Grid.Col>
 
-        {/* RIGHT SIDE */}
+        {/* RIGHT */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           {isZooming ? (
-            <Paper
-              shadow="md"
-              radius="lg"
-              p="sm"
-              withBorder
-              style={{ height: 450 }}
-            >
+            <Paper p="sm" style={{ height: 450 }}>
               <div
                 style={{
                   width: "100%",
                   height: "100%",
                   backgroundImage: `url(${images[activeIndex]})`,
-                  backgroundRepeat: "no-repeat",
                   backgroundSize: "180%",
                   backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
                 }}
               />
             </Paper>
           ) : (
-           <Paper withBorder p="lg" radius="lg">
-  <Stack gap="sm">
+            <Paper p="lg">
+              <Stack>
 
-    <Title order={2}>{product.name}</Title>
+                <Title>{product.name}</Title>
 
-    {/* 🔥 PRICE */}
-    <Text fw={800} size="xl" c="blue">
-      {product.price} QAR
-    </Text>
+                {product.categoryName && (
+                  <Badge>{product.categoryName}</Badge>
+                )}
 
-    <Text c="dimmed">{product.description}</Text>
+                <Group>
+                  <Rating value={avgRating} readOnly />
+                  <Text size="sm">({reviews.length})</Text>
+                </Group>
 
-    <Text size="sm">
-      Stock: {product.stockQuantity}
-    </Text>
+                <Text fw={800}>{product.price} QAR</Text>
 
-    {/* 🔥 ACTIONS */}
-    <Stack mt="md">
+                <Text>{product.description}</Text>
 
-      <Button
-        size="md"
-        onClick={handleAddToCart}
-        color={added ? "green" : "blue"}
-        disabled={added}
-      >
-        {added ? "Added ✓" : "Add to Cart"}
-      </Button>
+                <Text>Stock: {product.stockQuantity}</Text>
 
-      <Button variant="light" size="md" onClick={handleBuy}>
-        Buy Now
-      </Button>
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={outOfStock || added}
+                >
+                  {outOfStock
+                    ? "Out of Stock"
+                    : added
+                    ? "Added ✓"
+                    : "Add to Cart"}
+                </Button>
 
-      <Button
-        variant="outline"
-        onClick={() =>
-          reviewRef.current.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        Write a Review
-      </Button>
+                <Button variant="light" onClick={handleBuy}>
+                  Buy Now
+                </Button>
 
-    </Stack>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    reviewRef.current.scrollIntoView({
+                      behavior: "smooth",
+                    })
+                  }
+                >
+                  Write Review
+                </Button>
 
-  </Stack>
-</Paper>
+              </Stack>
+            </Paper>
           )}
         </Grid.Col>
-
       </Grid>
 
-      {/* 🔥 REVIEW SECTION */}
+      {/* REVIEWS */}
       <div ref={reviewRef}>
         <Divider my="xl" label="Customer Reviews" />
 
         <Title order={3}>Customer Reviews</Title>
 
-        {reviews.length > 0 && (
-          <Rating
-            value={
-              reviews.reduce((s, r) => s + r.rating, 0) /
-              reviews.length
-            }
-            readOnly
-          />
+        {reviews.length === 0 && (
+          <Text c="dimmed">No reviews yet</Text>
         )}
 
         <Select
-          mt="md"
           value={sort}
           onChange={setSort}
           data={[
             { value: "newest", label: "Newest" },
-            { value: "highest", label: "Highest rating" },
-            { value: "lowest", label: "Lowest rating" },
+            { value: "highest", label: "Highest" },
+            { value: "lowest", label: "Lowest" },
           ]}
         />
 
         {token && (
-          <Paper withBorder p="md" mt="md">
-            <Stack >
+          <Paper p="md">
+            <Stack>
               <Rating value={rating} onChange={setRating} />
-
-              <Textarea
-                placeholder="Write your review..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
+              <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
 
               <Group>
                 <Button onClick={handleSubmitReview}>
-                  {myReview ? "Update Review" : "Submit Review"}
+                  {myReview ? "Update" : "Submit"}
                 </Button>
 
                 {myReview && (
@@ -401,35 +352,24 @@ export default function ProductDetail() {
           </Paper>
         )}
 
-        {!token && (
-          <Text mt="md">
-            Please login to write a review
-          </Text>
-        )}
-
         <Stack mt="lg">
           {sortedReviews.map((r) => (
-           <Paper
-  key={r.id}
-  p="md"
-  withBorder
-  radius="md"
-  style={{
-    background: "#ffffff",
-  }}
->
-
+            <Paper key={r.id} p="md">
               <Group justify="space-between">
-                <Text fw={500}>{r.userName}</Text>
-                <Rating value={r.rating} readOnly size="sm" />
+                <Group>
+                  <Text>{r.userName}</Text>
+                  {r.userName === myReview?.userName && (
+                    <Badge size="xs">You</Badge>
+                  )}
+                </Group>
+                <Rating value={r.rating} readOnly />
               </Group>
 
-              <Text size="xs" c="dimmed" mt="xs">
+              <Text size="xs">
                 {new Date(r.createdAt).toLocaleString()}
               </Text>
 
-              <Text mt="sm">{r.comment}</Text>
-
+              <Text>{r.comment}</Text>
             </Paper>
           ))}
         </Stack>

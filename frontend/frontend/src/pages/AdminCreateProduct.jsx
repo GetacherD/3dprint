@@ -11,9 +11,12 @@ import {
   Stack,
   Group,
   Text,
+  Select,
+  ActionIcon, // 🔥 NEW
 } from "@mantine/core";
+import { IconTrash } from "@tabler/icons-react"; // 🔥 NEW
 import { notifications } from "@mantine/notifications";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../api/axios";
 
 export default function AdminCreateProduct() {
@@ -26,11 +29,39 @@ export default function AdminCreateProduct() {
   const [stockQuantity, setStockQuantity] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [categories, setCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState(null);
+
+  useEffect(() => {
+    api.get("/api/categories").then((res) => {
+      setCategories(
+        res.data.map((c) => ({
+          value: String(c.id),
+          label: c.name,
+        }))
+      );
+    });
+  }, []);
+
+  // 🔥 DELETE IMAGE BEFORE SAVE
+  const handleDeleteImage = (index) => {
+    setImageFile((prev) => prev.filter((_, i) => i !== index));
+    setPreview((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // 🔥 Upload all images
+      if (!categoryId) {
+        notifications.show({
+          title: "Validation",
+          message: "Please select a category",
+          color: "yellow",
+        });
+        return;
+      }
+
       const uploadedUrls = [];
 
       for (let file of imageFile) {
@@ -41,16 +72,14 @@ export default function AdminCreateProduct() {
         uploadedUrls.push(res.data.data);
       }
 
-      console.log("Uploaded URLs:", uploadedUrls);
-
-      // 🔥 Create product
       await api.post("/api/admin/products", {
         name,
         description,
         price,
         stockQuantity,
-        imageUrl: uploadedUrls[0], // fallback
+        imageUrl: uploadedUrls[0],
         imageUrls: uploadedUrls,
+        categoryId: Number(categoryId),
       });
 
       notifications.show({
@@ -66,6 +95,8 @@ export default function AdminCreateProduct() {
       setStockQuantity("");
       setImageFile([]);
       setPreview([]);
+      setCategoryId(null);
+
     } catch (err) {
       console.error(err);
 
@@ -86,93 +117,116 @@ export default function AdminCreateProduct() {
       </Title>
 
       <Paper shadow="xl" radius="lg" p="lg" withBorder>
-       <Stack gap="lg">
+        <Stack gap="lg">
 
-  {/* 🔹 PRODUCT INFO */}
-  <Paper withBorder p="md" radius="md">
-    <Stack>
-      <Text fw={600}>Product Information</Text>
+          {/* PRODUCT INFO */}
+          <Paper withBorder p="md" radius="md">
+            <Stack>
+              <Text fw={600}>Product Information</Text>
 
-      <TextInput
-        label="Product Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
+              <TextInput
+                label="Product Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
 
-      <Group grow>
-        <NumberInput
-          label="Price (QAR)"
-          value={price}
-          onChange={setPrice}
-          min={0}
-          required
-        />
+              <Select
+                label="Category"
+                placeholder="Select category"
+                data={categories}
+                value={categoryId}
+                onChange={setCategoryId}
+                required
+              />
 
-        <NumberInput
-          label="Stock Quantity"
-          value={stockQuantity}
-          onChange={setStockQuantity}
-          min={0}
-          required
-        />
-      </Group>
+              <Group grow>
+                <NumberInput
+                  label="Price (QAR)"
+                  value={price}
+                  onChange={setPrice}
+                  min={0}
+                  required
+                />
 
-      <Textarea
-        label="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-    </Stack>
-  </Paper>
+                <NumberInput
+                  label="Stock Quantity"
+                  value={stockQuantity}
+                  onChange={setStockQuantity}
+                  min={0}
+                  required
+                />
+              </Group>
 
-  {/* 🔹 IMAGE UPLOAD */}
-  <Paper withBorder p="md" radius="md">
-    <Stack>
-      <Text fw={600}>Product Images</Text>
+              <Textarea
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Stack>
+          </Paper>
 
-      <FileInput
-        label="Upload Images"
-        multiple
-        accept="image/*"
-        onChange={(files) => {
-          if (!files) return;
+          {/* IMAGE UPLOAD */}
+          <Paper withBorder p="md" radius="md">
+            <Stack>
+              <Text fw={600}>Product Images</Text>
 
-          const fileArray = Array.isArray(files) ? files : [files];
+              <FileInput
+                label="Upload Images"
+                multiple
+                accept="image/*"
+                onChange={(files) => {
+                  if (!files) return;
 
-          setImageFile(fileArray);
-          setPreview(fileArray.map((f) => URL.createObjectURL(f)));
-        }}
-      />
+                  const fileArray = Array.isArray(files) ? files : [files];
 
-      {/* 🔥 PREVIEW GRID */}
-      {preview.length > 0 && (
-        <Group>
-          {preview.map((img, i) => (
-            <Image
-              key={i}
-              src={img}
-              width={80}
-              height={80}
-              radius="md"
-            />
-          ))}
-        </Group>
-      )}
-    </Stack>
-  </Paper>
+                  setImageFile(fileArray);
+                  setPreview(fileArray.map((f) => URL.createObjectURL(f)));
+                }}
+              />
 
-  {/* 🔹 ACTION */}
-  <Button
-    loading={loading}
-    size="md"
-    radius="md"
-    onClick={handleSubmit}
-  >
-    Create Product
-  </Button>
+              {/* 🔥 ENHANCED PREVIEW */}
+              {preview.length > 0 && (
+                <Group>
+                  {preview.map((img, i) => (
+                    <div key={i} style={{ position: "relative" }}>
+                      <Image
+                        src={img}
+                        width={80}
+                        height={80}
+                        radius="md"
+                      />
 
-</Stack>
+                      <ActionIcon
+                        color="red"
+                        size="sm"
+                        style={{
+                          position: "absolute",
+                          top: 2,
+                          right: 2,
+                        }}
+                        onClick={() => handleDeleteImage(i)}
+                      >
+                        <IconTrash size={14} />
+                      </ActionIcon>
+                    </div>
+                  ))}
+                </Group>
+              )}
+
+            </Stack>
+          </Paper>
+
+          <Button
+            loading={loading}
+            size="md"
+            radius="md"
+            onClick={handleSubmit}
+          >
+            Create Product
+          </Button>
+
+        </Stack>
       </Paper>
     </Container>
   );
