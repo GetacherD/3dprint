@@ -31,3 +31,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# ENV FILES
+.env
+.env.*
+*.env
+
+# RUN SCRIPTS
+run.sh
+run-java.sh
+
+# UPLOADS (IMPORTANT — never commit these)
+uploads/
+
+# Optional: logs
