@@ -4,6 +4,7 @@ import {
   Container,
   Text,
   Badge,
+  Box,
 } from "@mantine/core";
 import { IconShoppingCart } from "@tabler/icons-react";
 import { useContext } from "react";
@@ -20,77 +21,103 @@ export default function Navbar() {
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <Container
-      size="lg"
+    <Box
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "15px 0",
+        borderBottom: "1px solid #e9ecef",
+        background: "white",
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
       }}
     >
-      <Text
-        fw={700}
-        style={{ cursor: "pointer" }}
-        onClick={() => navigate("/")}
+      <Container
+        size="lg"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: 70,
+        }}
       >
-        3D Print Store
-      </Text>
-
-      <Group>
-
-        {/* 🌍 EXPLORE */}
-        <Button variant="subtle" onClick={() => navigate("/")}>
-          Explore
-        </Button>
-
-        {/* 🛒 CART */}
-        <Button
-          variant="light"
-          onClick={() => navigate("/cart")}
-          leftSection={<IconShoppingCart size={16} />}
+        {/* 🔥 LOGO / BRAND */}
+        <Text
+          fw={800}
+          size="lg"
+          style={{
+            cursor: "pointer",
+            letterSpacing: "-0.5px",
+          }}
+          onClick={() => navigate("/")}
         >
-          Cart
-          {totalItems > 0 && (
-            <Badge ml="xs" color="red">
-              {totalItems}
-            </Badge>
-          )}
-        </Button>
+          3D Market
+        </Text>
 
-        {!token && (
-          <>
-            <Button onClick={() => navigate("/login")}>
-              Login
+        {/* 🔥 RIGHT SIDE */}
+        <Group>
+
+          <Button variant="subtle" onClick={() => navigate("/")}>
+            Home
+          </Button>
+
+          {/* 🛒 CART */}
+          <Box style={{ position: "relative" }}>
+            <Button
+              variant="light"
+              onClick={() => navigate("/cart")}
+              leftSection={<IconShoppingCart size={16} />}
+            >
+              Cart
             </Button>
-            <Button variant="outline" onClick={() => navigate("/register")}>
-              Register
-            </Button>
-          </>
-        )}
 
-        {token && (
-          <>
-            {role === "ADMIN" && (
-              <>
-                <Badge color="red">Admin</Badge>
-
-                <Button onClick={() => navigate("/admin/products")}>
-                  Dashboard
-                </Button>
-
-                <Button onClick={() => navigate("/admin/create-product")}>
-                  Create
-                </Button>
-              </>
+            {totalItems > 0 && (
+              <Badge
+                color="red"
+                size="sm"
+                style={{
+                  position: "absolute",
+                  top: -6,
+                  right: -6,
+                }}
+              >
+                {totalItems}
+              </Badge>
             )}
+          </Box>
 
-            <Button color="red" variant="outline" onClick={logout}>
-              Logout
-            </Button>
-          </>
-        )}
+          {!token && (
+            <>
+              <Button onClick={() => navigate("/login")}>
+                Login
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/register")}>
+                Register
+              </Button>
+            </>
+          )}
 
-      </Group>
-    </Container>
+          {token && (
+            <>
+              {role === "ADMIN" && (
+                <>
+                  <Badge color="red">Admin</Badge>
+
+                  <Button onClick={() => navigate("/admin/products")}>
+                    Dashboard
+                  </Button>
+
+                  <Button variant="light" onClick={() => navigate("/admin/create-product")}>
+                    Create
+                  </Button>
+                </>
+              )}
+
+              <Button color="red" variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </>
+          )}
+        </Group>
+      </Container>
+    </Box>
   );
 }

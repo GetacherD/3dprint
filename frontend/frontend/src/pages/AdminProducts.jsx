@@ -15,11 +15,14 @@ import {
   Stack,
   FileInput,
   ActionIcon,
+  SimpleGrid,
+  Text,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { getImageUrl } from "../utils/image";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -36,12 +39,20 @@ export default function AdminProducts() {
   const [imageFiles, setImageFiles] = useState([]);
   const [preview, setPreview] = useState([]);
 
+  const [heroTitle, setHeroTitle] = useState("");
+const [heroDesc, setHeroDesc] = useState("");
+
   const fetchProducts = () => {
     setLoading(true);
     api.get("/api/products?page=0&size=50").then((res) => {
       setProducts(res.data.data.content);
       setLoading(false);
     });
+    api.get("/api/content/hero_title")
+    .then(res => setHeroTitle(res.data.data));
+
+  api.get("/api/content/hero_description")
+    .then(res => setHeroDesc(res.data.data));
   };
 
   useEffect(() => {
@@ -136,49 +147,130 @@ export default function AdminProducts() {
 
   return (
     <Container size="lg">
-      <Title mb="lg">Admin Dashboard</Title>
+      <Title order={2} mb="lg">
+  Product Management
+</Title>
+<Paper withBorder p="md" mb="lg" radius="md">
+  <Stack>
+    <Text fw={600} mb="xs">
+  Homepage Hero Content
+</Text>
+
+    <Textarea
+      label="Hero Title"
+      value={heroTitle}
+      onChange={(e) => setHeroTitle(e.target.value)}
+    />
+
+    <Textarea
+      label="Hero Description"
+      value={heroDesc}
+      onChange={(e) => setHeroDesc(e.target.value)}
+    />
+
+    <Button
+      onClick={async () => {
+        try {
+          await api.put(
+  "/api/content/hero_title",
+  { value: heroTitle },
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }
+);
+
+await api.put(
+  "/api/content/hero_description",
+  { value: heroDesc },
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }
+);
+
+          notifications.show({
+            title: "Saved",
+            message: "Homepage content updated",
+            color: "green",
+          });
+        } catch {
+          notifications.show({
+            title: "Error",
+            message: "Failed to update content",
+            color: "red",
+          });
+        }
+      }}
+    >
+      Save Content
+    </Button>
+  </Stack>
+</Paper>
 
       <Paper withBorder p="md">
         {loading ? (
           <Center><Loader /></Center>
         ) : (
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Image</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Price</Table.Th>
-                <Table.Th>Stock</Table.Th>
-                <Table.Th>Actions</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }}>
+  {products.map((p) => (
+    <Paper
+      key={p.id}
+      withBorder
+      radius="lg"
+      p="sm"
+      style={{
+        transition: "0.2s",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow =
+          "0 8px 20px rgba(0,0,0,0.08)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "none";
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      {/* IMAGE */}
+      <Image
+        src={getImageUrl(p.imageUrl)}
+        height={160}
+        radius="md"
+        fit="cover"
+      />
 
-            <Table.Tbody>
-              {products.map((p) => (
-                <Table.Tr key={p.id}>
-                  <Table.Td>
-                    <Image
-                      src={`${p.imageUrl}`}
-                      width={60}
-                      height={60}
-                    />
-                  </Table.Td>
+      {/* INFO */}
+      <Stack mt="sm" gap={4}>
+        <Text fw={600} lineClamp={1}>
+          {p.name}
+        </Text>
 
-                  <Table.Td>{p.name}</Table.Td>
-                  <Table.Td>{p.price}</Table.Td>
-                  <Table.Td>{p.stockQuantity}</Table.Td>
+        <Text size="sm" c="dimmed">
+          {p.price} QAR
+        </Text>
 
-                  <Table.Td>
-                    <Group>
-                      <Button size="xs" onClick={() => openEdit(p)}>
-                        Edit
-                      </Button>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+        <Text size="xs">
+          Stock: {p.stockQuantity}
+        </Text>
+      </Stack>
+
+      {/* ACTION */}
+      <Group mt="sm">
+        <Button
+          size="xs"
+          fullWidth
+          onClick={() => openEdit(p)}
+        >
+          Edit
+        </Button>
+      </Group>
+    </Paper>
+  ))}
+</SimpleGrid>
         )}
       </Paper>
 

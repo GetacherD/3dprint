@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")).render(
         defaultRadius: "md",
       }}
     >
-       <Notifications position="top-right" />
+       <Notifications position="top-right"  zIndex={10000}/>
       <CartProvider>
     <App />
   </CartProvider>

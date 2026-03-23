@@ -9,20 +9,32 @@ import ProtectedRoute from "./routes/ProtectedRout";
 import Navbar from "./components/Navbar";
 import AdminProducts from "./pages/AdminProducts"; // 🔥 ADD
 import Cart from "./pages/Cart";
+import Footer from "./components/Footer";
 
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+  <BrowserRouter>
 
-        <Navbar />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
 
+      {/* 🔝 Navbar */}
+      <Navbar />
+
+      {/* 📄 Main Content */}
+     <div style={{ flex: 1, paddingBottom: "20px" }}>
         <Routes>
           <Route path="/" element={<Products />} />
           <Route path="/login" element={<Login />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-<Route path="/cart" element={<Cart />} />
-          {/* 🔥 ADMIN DASHBOARD */}
+          <Route path="/cart" element={<Cart />} />
+
           <Route
             path="/admin/products"
             element={
@@ -32,7 +44,6 @@ export default function App() {
             }
           />
 
-          {/* 🔥 CREATE PRODUCT */}
           <Route
             path="/admin/create-product"
             element={
@@ -44,8 +55,14 @@ export default function App() {
 
           <Route path="/register" element={<Register />} />
         </Routes>
+      </div>
 
-      </BrowserRouter>
-    </AuthProvider>
+      {/* 🔻 Footer */}
+      <Footer />
+
+    </div>
+
+  </BrowserRouter>
+</AuthProvider>
   );
 }
