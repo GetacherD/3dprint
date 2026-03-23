@@ -14,6 +14,7 @@ import {
   Stack,
   Accordion,
 } from "@mantine/core";
+
 import {
   IconShoppingCart,
   IconBrandWhatsapp,
@@ -22,6 +23,7 @@ import {
   IconSettings,
   IconHome,
 } from "@tabler/icons-react";
+
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
@@ -59,23 +61,34 @@ export default function Navbar() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            height: 70,
+            height: 80, // 🔥 better spacing
           }}
         >
-          <Text fw={800} size="lg" style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+          {/* LOGO */}
+          <Text
+            fw={800}
+            size="lg"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
             3D Market
           </Text>
 
-          {/* DESKTOP */}
-          <Group gap="xs" visibleFrom="sm">
-
-            <Button variant="subtle" onClick={() => navigate("/")}>
+          {/* DESKTOP MENU */}
+          <Group gap="sm" visibleFrom="sm">
+            <Button
+              variant="subtle"
+              styles={{ root: { padding: "8px 14px", borderRadius: 8 } }}
+              onClick={() => navigate("/")}
+            >
               Home
             </Button>
 
+            {/* CART */}
             <Box style={{ position: "relative" }}>
               <Button
                 variant="light"
+                styles={{ root: { padding: "8px 14px", borderRadius: 8 } }}
                 onClick={() => navigate("/cart")}
                 leftSection={<IconShoppingCart size={16} />}
               >
@@ -86,7 +99,11 @@ export default function Navbar() {
                 <Badge
                   color="red"
                   size="sm"
-                  style={{ position: "absolute", top: -6, right: -6 }}
+                  style={{
+                    position: "absolute",
+                    top: -6,
+                    right: -6,
+                  }}
                 >
                   {totalItems}
                 </Badge>
@@ -103,9 +120,11 @@ export default function Navbar() {
                 <Menu.Item leftSection={<IconBrandWhatsapp size={16} />}>
                   WhatsApp
                 </Menu.Item>
+
                 <Menu.Item leftSection={<IconMail size={16} />}>
                   Email
                 </Menu.Item>
+
                 <Menu.Item leftSection={<IconBrandTelegram size={16} />}>
                   Telegram
                 </Menu.Item>
@@ -129,7 +148,10 @@ export default function Navbar() {
                   Dashboard
                 </Button>
 
-                <Button variant="light" onClick={() => navigate("/admin/create-product")}>
+                <Button
+                  variant="light"
+                  onClick={() => navigate("/admin/create-product")}
+                >
                   Create
                 </Button>
 
@@ -160,88 +182,161 @@ export default function Navbar() {
         </Container>
       </Box>
 
-      {/* 📱 DRAWER (MOBILE MENU) */}
+      {/* 📱 DRAWER */}
       <Drawer
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Menu"
-        padding="md"
-        size="80%"
-      >
-        <Stack>
+  opened={opened}
+  onClose={() => setOpened(false)}
+  title={<Text fw={600}>Menu</Text>}
+  padding="lg"
+  size="80%"
+>
+  <Stack mt="sm" gap="md" align="stretch">
 
-          <Button variant="subtle" leftSection={<IconHome size={16} />} onClick={() => go("/")}>
-            Home
-          </Button>
+    <Divider />
 
-          <Button variant="light" onClick={() => go("/cart")}>
-            Cart ({totalItems})
-          </Button>
+    <Button
+      fullWidth
+      variant="subtle"
+      justify="flex-start"
+      leftSection={<IconHome size={16} />}
+      onClick={() => go("/")}
+    >
+      Home
+    </Button>
 
-          {/* 🔥 ACCORDION (SMART UX) */}
-          <Accordion defaultValue="contact">
-
-            {/* CONTACT */}
-            <Accordion.Item value="contact">
-              <Accordion.Control>Contact</Accordion.Control>
-              <Accordion.Panel>
-                <Stack>
-                  <Button variant="subtle">WhatsApp</Button>
-                  <Button variant="subtle">Email</Button>
-                  <Button variant="subtle">Telegram</Button>
-                </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-
-            {/* ADMIN */}
-            {token && role === "ADMIN" && (
-              <Accordion.Item value="admin">
-                <Accordion.Control>Admin</Accordion.Control>
-                <Accordion.Panel>
-                  <Stack>
-                    <Button variant="subtle" onClick={() => go("/admin/products")}>
-                      Dashboard
-                    </Button>
-                    <Button variant="light" onClick={() => go("/admin/create-product")}>
-                      Create
-                    </Button>
-                    <Button variant="subtle" onClick={() => go("/admin/control-center")}>
-                      Control Center
-                    </Button>
-                  </Stack>
-                </Accordion.Panel>
-              </Accordion.Item>
-            )}
-
-            {/* ACCOUNT */}
-            {!token && (
-              <Accordion.Item value="account">
-                <Accordion.Control>Account</Accordion.Control>
-                <Accordion.Panel>
-                  <Stack>
-                    <Button variant="outline" onClick={() => go("/login")}>
-                      Login
-                    </Button>
-                    <Button variant="outline" onClick={() => go("/register")}>
-                      Register
-                    </Button>
-                  </Stack>
-                </Accordion.Panel>
-              </Accordion.Item>
-            )}
-
-          </Accordion>
-
-          {token && (
-            <Button color="red" variant="outline" onClick={logout}>
-              Logout
-            </Button>
+    <Button
+      fullWidth
+      variant="subtle"
+      justify="flex-start"
+      onClick={() => go("/cart")}
+    >
+      Cart{totalItems > 0 && (
+            <Badge
+              size="xs"
+              color="red"
+              style={{
+                position: "absolute",
+                left: 50, // 🔥 position badge to the right of text
+                top: 3,
+              }}
+            >
+              {totalItems}
+            </Badge>
           )}
+    </Button>
 
-        </Stack>
-      </Drawer>
+    {/* 🔥 ACCORDION */}
+    <Accordion defaultValue="contact" variant="separated">
 
-      {/* 🔥 MOBILE BOTTOM NAV */}
+      <Accordion.Item value="contact">
+        <Accordion.Control>
+          <Text fw={500}>Contact</Text>
+        </Accordion.Control>
+
+        <Accordion.Panel>
+          <Stack align="stretch">
+            <Button fullWidth variant="subtle" justify="flex-start">
+              WhatsApp
+            </Button>
+            <Button fullWidth variant="subtle" justify="flex-start">
+              Email
+            </Button>
+            <Button fullWidth variant="subtle" justify="flex-start">
+              Telegram
+            </Button>
+          </Stack>
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      {token && role === "ADMIN" && (
+        <Accordion.Item value="admin">
+          <Accordion.Control>
+            <Text fw={500}>Admin</Text>
+          </Accordion.Control>
+
+          <Accordion.Panel>
+            <Stack align="stretch">
+              <Button
+                fullWidth
+                variant="subtle"
+                justify="flex-start"
+                onClick={() => go("/admin/products")}
+              >
+                Dashboard
+              </Button>
+
+              <Button
+                fullWidth
+                variant="light"
+                justify="flex-start"
+                onClick={() => go("/admin/create-product")}
+              >
+                Create
+              </Button>
+
+              <Button
+                fullWidth
+                variant="subtle"
+                justify="flex-start"
+                onClick={() => go("/admin/control-center")}
+              >
+                Control Center
+              </Button>
+            </Stack>
+          </Accordion.Panel>
+        </Accordion.Item>
+      )}
+
+      {!token && (
+        <Accordion.Item value="account">
+          <Accordion.Control>
+            <Text fw={500}>Account</Text>
+          </Accordion.Control>
+
+          <Accordion.Panel>
+            <Stack align="stretch">
+              <Button
+                fullWidth
+                variant="outline"
+                justify="flex-start"
+                onClick={() => go("/login")}
+              >
+                Login
+              </Button>
+
+              <Button
+                fullWidth
+                variant="outline"
+                justify="flex-start"
+                onClick={() => go("/register")}
+              >
+                Register
+              </Button>
+            </Stack>
+          </Accordion.Panel>
+        </Accordion.Item>
+      )}
+    </Accordion>
+
+    {token && (
+      <>
+        <Divider />
+        <Button
+          fullWidth
+          color="red"
+          variant="outline"
+          justify="flex-start"
+          onClick={logout}
+        >
+          Logout
+        </Button>
+      </>
+    )}
+
+  </Stack>
+</Drawer>
+
+      {/* 📱 MOBILE BOTTOM NAV */}
       <Box
         hiddenFrom="sm"
         style={{

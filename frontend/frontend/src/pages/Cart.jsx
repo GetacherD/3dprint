@@ -14,6 +14,7 @@ import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
+import { getImageUrl } from "../utils/image";
 
 export default function Cart() {
   const {
@@ -73,7 +74,7 @@ export default function Cart() {
                 {/* LEFT */}
                 <Group>
                   <Image
-                    src={`${item.imageUrl}`}
+                    src={`${getImageUrl(item.imageUrl)}`}
                     width={60}
                     height={60}
                     radius="md"

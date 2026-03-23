@@ -1,7 +1,6 @@
 import {
   Container,
   Title,
-  Table,
   Button,
   Group,
   Image,
@@ -9,9 +8,6 @@ import {
   Loader,
   Center,
   Modal,
-  TextInput,
-  NumberInput,
-  Textarea,
   Stack,
   FileInput,
   ActionIcon,
@@ -24,6 +20,19 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { getImageUrl } from "../utils/image";
 
+// 🔥 DND KIT
+import {
+  DndContext,
+  closestCenter,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,14 +40,8 @@ export default function AdminProducts() {
   const [opened, setOpened] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-  const [stockQuantity, setStockQuantity] = useState("");
-
   const [imageFiles, setImageFiles] = useState([]);
   const [preview, setPreview] = useState([]);
-
 
   const fetchProducts = () => {
     setLoading(true);
@@ -46,11 +49,6 @@ export default function AdminProducts() {
       setProducts(res.data.data.content);
       setLoading(false);
     });
-    api.get("/api/content/hero_title")
-    .then(res => setHeroTitle(res.data.data));
-
-  api.get("/api/content/hero_description")
-    .then(res => setHeroDesc(res.data.data));
   };
 
   useEffect(() => {
@@ -59,158 +57,155 @@ export default function AdminProducts() {
 
   const openEdit = (product) => {
     setSelected(product);
-    setName(product.name);
-    setPrice(product.price);
-    setDescription(product.description);
-    setStockQuantity(product.stockQuantity);
-
     setImageFiles([]);
     setPreview([]);
-
     setOpened(true);
   };
 
-  const handleDeleteImage = async (imgUrl) => {
-    try {
-      await api.delete(
-        `/api/admin/products/${selected.id}/image?imageUrl=${encodeURIComponent(imgUrl)}`
-      );
+  // 🔥 DELETE PRODUCT
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm("Delete this product?")) return;
 
-      notifications.show({
-        title: "Deleted",
-        message: "Image removed",
-        color: "green",
-      });
+    await api.delete(`/api/admin/products/${id}`);
 
-      // 🔥 update UI instantly
-      setSelected((prev) => ({
-        ...prev,
-        imageUrls: prev.imageUrls.filter((i) => i !== imgUrl),
-      }));
+    notifications.show({
+      title: "Deleted",
+      message: "Product deleted",
+      color: "green",
+    });
 
-    } catch {
-      notifications.show({
-        title: "Error",
-        message: "Failed to delete image",
-        color: "red",
-      });
-    }
+    fetchProducts();
   };
 
+  // 🔥 DELETE IMAGE
+  const handleDeleteImage = async (imgUrl) => {
+    await api.delete(
+      `/api/admin/products/${selected.id}/image?imageUrl=${encodeURIComponent(imgUrl)}`
+    );
+
+    setSelected((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((i) => i !== imgUrl),
+    }));
+  };
+
+  // 🔥 DND SORTABLE ITEM
+  function SortableItem({ id }) {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      cursor: "grab",
+      position: "relative",
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        <Image src={getImageUrl(id)} width={90} height={90} radius="md" />
+
+        <ActionIcon
+          color="red"
+          size="sm"
+          style={{ position: "absolute", top: 0, right: 0 }}
+          onClick={() => handleDeleteImage(id)}
+        >
+          <IconTrash size={14} />
+        </ActionIcon>
+      </div>
+    );
+  }
+
+  // 🔥 HANDLE DRAG END
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = selected.imageUrls.indexOf(active.id);
+    const newIndex = selected.imageUrls.indexOf(over.id);
+
+    const newImages = arrayMove(selected.imageUrls, oldIndex, newIndex);
+
+    setSelected((prev) => ({
+      ...prev,
+      imageUrls: newImages,
+    }));
+  };
+
+  // 🔥 UPDATE
   const handleUpdate = async () => {
-    try {
-      let uploadedUrls = [];
+    let uploadedUrls = [];
 
-      if (imageFiles.length > 0) {
-        for (let file of imageFiles) {
-          const formData = new FormData();
-          formData.append("file", file);
+    if (imageFiles.length > 0) {
+      for (let file of imageFiles) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-          const res = await api.post("/api/admin/products/upload", formData);
-          uploadedUrls.push(res.data.data);
-        }
+        const res = await api.post("/api/admin/products/upload", formData);
+        uploadedUrls.push(res.data.data);
       }
-
-      await api.put(`/api/admin/products/${selected.id}`, {
-        name,
-        description,
-        price,
-        stockQuantity,
-        imageUrl:
-          uploadedUrls.length > 0
-            ? uploadedUrls[0]
-            : selected.imageUrl,
-        imageUrls:
-          uploadedUrls.length > 0
-            ? [...(selected.imageUrls || []), ...uploadedUrls]
-            : selected.imageUrls,
-      });
-
-      notifications.show({
-        title: "Updated",
-        message: "Product updated",
-        color: "green",
-      });
-
-      setOpened(false);
-      fetchProducts();
-    } catch {
-      notifications.show({
-        title: "Error",
-        message: "Update failed",
-        color: "red",
-      });
     }
+
+    const finalImages =
+      uploadedUrls.length > 0
+        ? [...selected.imageUrls, ...uploadedUrls]
+        : selected.imageUrls;
+
+    await api.put(`/api/admin/products/${selected.id}`, {
+      name: selected.name,
+      description: selected.description,
+      price: selected.price,
+      stockQuantity: selected.stockQuantity,
+      imageUrl: finalImages[0],
+      imageUrls: finalImages,
+    });
+
+    notifications.show({
+      title: "Updated",
+      message: "Product updated",
+      color: "green",
+    });
+
+    setOpened(false);
+    fetchProducts();
   };
 
   return (
     <Container size="lg">
-      <Title order={2} mb="lg">
-  Product Management
-</Title>
-
+      <Title mb="lg">Product Management</Title>
 
       <Paper withBorder p="md">
         {loading ? (
           <Center><Loader /></Center>
         ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }}>
-  {products.map((p) => (
-    <Paper
-      key={p.id}
-      withBorder
-      radius="lg"
-      p="sm"
-      style={{
-        transition: "0.2s",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow =
-          "0 8px 20px rgba(0,0,0,0.08)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "none";
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      {/* IMAGE */}
-      <Image
-        src={getImageUrl(p.imageUrl)}
-        height={160}
-        radius="md"
-        fit="cover"
-      />
+          <SimpleGrid cols={4}>
+            {products.map((p) => (
+              <Paper key={p.id} withBorder p="sm">
+                <Image
+                  src={getImageUrl(p.imageUrl)}
+                  height={150}
+                />
 
-      {/* INFO */}
-      <Stack mt="sm" gap={4}>
-        <Text fw={600} lineClamp={1}>
-          {p.name}
-        </Text>
+                <Text fw={600}>{p.name}</Text>
 
-        <Text size="sm" c="dimmed">
-          {p.price} QAR
-        </Text>
+                <Group mt="sm">
+                  <Button size="xs" onClick={() => openEdit(p)}>
+                    Edit
+                  </Button>
 
-        <Text size="xs">
-          Stock: {p.stockQuantity}
-        </Text>
-      </Stack>
-
-      {/* ACTION */}
-      <Group mt="sm">
-        <Button
-          size="xs"
-          fullWidth
-          onClick={() => openEdit(p)}
-        >
-          Edit
-        </Button>
-      </Group>
-    </Paper>
-  ))}
-</SimpleGrid>
+                  <Button
+                    size="xs"
+                    color="red"
+                    onClick={() => handleDeleteProduct(p.id)}
+                  >
+                    Delete
+                  </Button>
+                </Group>
+              </Paper>
+            ))}
+          </SimpleGrid>
         )}
       </Paper>
 
@@ -218,27 +213,21 @@ export default function AdminProducts() {
       <Modal opened={opened} onClose={() => setOpened(false)} title="Edit Product">
         <Stack>
 
-          {/* 🔥 EXISTING IMAGES */}
-          <Group>
-            {selected?.imageUrls?.map((img, i) => (
-              <div key={i} style={{ position: "relative" }}>
-                <Image
-                  src={`${img}`}
-                  width={80}
-                  height={80}
-                />
-                <ActionIcon
-                  color="red"
-                  size="sm"
-                  style={{ position: "absolute", top: 0, right: 0 }}
-                  onClick={() => handleDeleteImage(img)}
-                >
-                  <IconTrash size={14} />
-                </ActionIcon>
-              </div>
-            ))}
-          </Group>
+          {/* 🔥 DRAG AREA */}
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={selected?.imageUrls || []}
+              strategy={horizontalListSortingStrategy}
+            >
+              <Group>
+                {selected?.imageUrls?.map((img) => (
+                  <SortableItem key={img} id={img} />
+                ))}
+              </Group>
+            </SortableContext>
+          </DndContext>
 
+          {/* UPLOAD */}
           <FileInput
             multiple
             onChange={(files) => {
@@ -248,14 +237,13 @@ export default function AdminProducts() {
             }}
           />
 
-          {/* 🔥 NEW PREVIEW */}
           <Group>
             {preview.map((p, i) => (
               <Image key={i} src={p} width={80} height={80} />
             ))}
           </Group>
 
-          <Button onClick={handleUpdate}>Update</Button>
+          <Button onClick={handleUpdate}>Save Changes</Button>
 
         </Stack>
       </Modal>

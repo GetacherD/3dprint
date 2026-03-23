@@ -25,8 +25,8 @@ export default function Products() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-const [heroTitle, setHeroTitle] = useState("");
-const [heroDesc, setHeroDesc] = useState("");
+  const [heroTitle, setHeroTitle] = useState("");
+  const [heroDesc, setHeroDesc] = useState("");
 
   useEffect(() => {
     api.get("/api/products?page=0&size=50").then((res) => {
@@ -35,20 +35,18 @@ const [heroDesc, setHeroDesc] = useState("");
       setFiltered(data);
       setLoading(false);
     });
-    
-  api.get("/api/content/hero_title")
-    .then(res => setHeroTitle(res.data.data))
-    .catch(() => setHeroTitle("3D Printing Marketplace"));
 
-  api.get("/api/content/hero_description")
-    .then(res => setHeroDesc(res.data.data))
-    .catch(() =>
-      setHeroDesc("Discover high-quality 3D printed products. Simple, fast, and reliable.")
-    );
+    api.get("/api/content/hero_title")
+      .then(res => setHeroTitle(res.data.data))
+      .catch(() => setHeroTitle("3D Printing Marketplace"));
 
+    api.get("/api/content/hero_description")
+      .then(res => setHeroDesc(res.data.data))
+      .catch(() =>
+        setHeroDesc("Discover high-quality 3D printed products. Simple, fast, and reliable.")
+      );
   }, []);
 
-  // 🔥 FILTER LOGIC
   const applyFilter = (searchValue, min, max) => {
     let result = [...products];
 
@@ -69,85 +67,98 @@ const [heroDesc, setHeroDesc] = useState("");
     setFiltered(result);
   };
 
-  // 🔥 DEBOUNCED SEARCH
   const debouncedSearch = debounce((value) => {
     applyFilter(value, minPrice, maxPrice);
   }, 300);
 
   return (
     <>
-      {/* HERO */}
+      {/* 🔥 HERO (RESPONSIVE) */}
       <Box
+        style={{
+          background: "linear-gradient(135deg, #4c6ef5, #15aabf)",
+          color: "white",
+          padding: "60px 16px", // 🔥 smaller padding mobile
+          marginBottom: "24px",
+        }}
+      >
+        <Container size="lg">
+          <Stack gap="xs">
+            <Title
+              fw={800}
+              style={{
+                fontSize: "clamp(24px, 5vw, 40px)", // 🔥 responsive font
+                lineHeight: 1.2,
+              }}
+            >
+              {heroTitle || "3D Printing Marketplace"}
+            </Title>
 
-  style={{
-    background: "linear-gradient(135deg, #4c6ef5, #15aabf)",
-    color: "white",
-    padding: "80px 20px",
-    marginBottom: "40px",
-  }}
->
-  <Container size="lg">
-    <Stack gap="sm">
-      <Title order={1} fw={800}>
-  {heroTitle || "3D Printing Marketplace"}
-</Title>
+            <Text size="sm" style={{ opacity: 0.9 }}>
+              {heroDesc ||
+                "Discover high-quality 3D printed products. Simple, fast, and reliable."}
+            </Text>
+          </Stack>
+        </Container>
+      </Box>
 
-<Text size="lg" opacity={0.9}>
-  {heroDesc || "Discover high-quality 3D printed products. Simple, fast, and reliable."}
-</Text>
-    </Stack>
-  </Container>
-</Box>
+      {/* 🔥 FILTER BAR */}
+      <Container size="lg" mb="lg">
+        <Box
+          style={{
+            background: "white",
+            padding: "16px",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          }}
+        >
+          {/* 🔥 MOBILE STACK / DESKTOP ROW */}
+          <Stack gap="sm">
+            <TextInput
+              placeholder="Search products..."
+              leftSection={<IconSearch size={16} />}
+              radius="md"
+              value={search}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearch(value);
+                debouncedSearch(value);
+              }}
+            />
 
-      {/* FILTER BAR */}
-     <Container size="lg" mb="xl">
-  <Box
-    style={{
-      background: "white",
-      padding: "20px",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-    }}
-  >
-    <Group grow>
-          <TextInput
-            placeholder="Search products..."
-            leftSection={<IconSearch size={16} />}
-            radius="md"
-            value={search}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearch(value);
-              debouncedSearch(value);
-            }}
-          />
+            <Group grow>
+              <NumberInput
+                placeholder="Min Price"
+                radius="md"
+                value={minPrice}
+                onChange={(value) => {
+                  setMinPrice(value);
+                  applyFilter(search, value, maxPrice);
+                }}
+              />
 
-          <NumberInput
-            placeholder="Min Price"
-            radius="md"
-            value={minPrice}
-            onChange={(value) => {
-              setMinPrice(value);
-              applyFilter(search, value, maxPrice);
-            }}
-          />
+              <NumberInput
+                placeholder="Max Price"
+                radius="md"
+                value={maxPrice}
+                onChange={(value) => {
+                  setMaxPrice(value);
+                  applyFilter(search, minPrice, value);
+                }}
+              />
+            </Group>
+          </Stack>
+        </Box>
+      </Container>
 
-          <NumberInput
-            placeholder="Max Price"
-  radius="md"
-            value={maxPrice}
-            onChange={(value) => {
-              setMaxPrice(value);
-              applyFilter(search, minPrice, value);
-            }}
-          />
-       </Group>
-  </Box>
-</Container>
-<Title order={3} mb="md">
-  Products
-</Title>
-      {/* PRODUCTS */}
+      {/* 🔥 TITLE FIX (inside container) */}
+      <Container size="lg">
+        <Title order={3} mb="md">
+          Products
+        </Title>
+      </Container>
+
+      {/* 🔥 PRODUCTS */}
       <Container size="lg">
         {loading ? (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }}>

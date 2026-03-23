@@ -35,18 +35,20 @@ export default function ProductCard({ product }) {
 
   return (
     <Card
-      radius="xl"
+      radius="lg"
       withBorder
-      padding="md"
+      padding="lg"
       style={{
         cursor: "pointer",
-        transition: "all 0.25s ease",
+        transition: "all 0.2s ease",
       }}
       onClick={() => navigate(`/products/${product.id}`)}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow =
-          "0 10px 25px rgba(0,0,0,0.1)";
+        if (window.innerWidth > 768) {
+          e.currentTarget.style.transform = "translateY(-4px)";
+          e.currentTarget.style.boxShadow =
+            "0 8px 20px rgba(0,0,0,0.08)";
+        }
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "none";
@@ -57,12 +59,13 @@ export default function ProductCard({ product }) {
       <Card.Section>
         <Box
           style={{
-            height: 200,
+            height: "clamp(140px, 30vw, 200px)", // 🔥 responsive height
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
             background: "#f8f9fa",
+            padding: "10px",
           }}
         >
           <Image
@@ -70,32 +73,50 @@ export default function ProductCard({ product }) {
             fit="contain"
             style={{
               maxHeight: "100%",
-              transition: "transform 0.3s ease",
+              width: "100%",
+              objectFit: "contain",
             }}
           />
         </Box>
       </Card.Section>
 
-      <Stack mt="sm" gap={6}>
-
-        {/* 🔥 NAME */}
-        <Text fw={600} lineClamp={2}>
+      {/* 🔥 CONTENT */}
+      <Stack mt="md" gap="xs">
+        {/* NAME */}
+        <Text
+          fw={600}
+          lineClamp={2}
+          style={{
+            fontSize: "clamp(14px, 2.5vw, 16px)",
+            minHeight: "40px", // 🔥 keeps cards aligned
+          }}
+        >
           {product.name}
         </Text>
 
-        {/* 🔥 PRICE (IMPORTANT VISUAL) */}
-        <Text fw={700} size="lg" c="blue">
+        {/* PRICE */}
+        <Text
+          fw={700}
+          c="blue"
+          style={{
+            fontSize: "clamp(16px, 3vw, 18px)",
+          }}
+        >
           {product.price} QAR
         </Text>
 
-        {/* ⭐ RATING */}
-        <Group gap={4}>
-          <Rating value={avgRating} fractions={2} readOnly size="sm" />
+        {/* RATING */}
+        <Group gap={6} align="center">
+          <Rating
+            value={avgRating}
+            fractions={2}
+            readOnly
+            size="sm"
+          />
           <Text size="xs" c="dimmed">
             ({count})
           </Text>
         </Group>
-
       </Stack>
     </Card>
   );

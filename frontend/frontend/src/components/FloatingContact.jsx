@@ -22,6 +22,12 @@ export default function FloatingContact() {
   const [contact, setContact] = useState({});
   const [isMobile, setIsMobile] = useState(false);
 
+  const [dragging, setDragging] = useState(false);
+  const [position, setPosition] = useState(() => {
+    const saved = localStorage.getItem("floating-pos");
+    return saved ? JSON.parse(saved) : { x: null, y: null };
+  });
+
   // 🔥 Detect mobile
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -58,7 +64,7 @@ export default function FloatingContact() {
 
   const open = (url) => window.open(url, "_blank");
 
-  // 🔥 Build actions dynamically
+  // 🔥 ACTIONS
   const actions = [
     {
       key: "phone",
@@ -97,18 +103,64 @@ export default function FloatingContact() {
     },
   ];
 
-  // 🔥 Mobile → call first
   const sortedActions = isMobile
     ? [...actions].sort((a) => (a.key === "phone" ? -1 : 1))
     : actions;
 
+  // =========================
+  // 🔥 DRAG HANDLERS
+  // =========================
+
+  const handleStart = () => {
+    setDragging(true);
+  };
+
+  const handleMove = (e) => {
+    if (!dragging) return;
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    setPosition({
+      x: clientX - 30,
+      y: clientY - 30,
+    });
+  };
+
+  const handleEnd = () => {
+    if (!dragging) return;
+    setDragging(false);
+
+    // 🔥 SNAP TO EDGE
+    const screenWidth = window.innerWidth;
+    const snapX =
+      position.x < screenWidth / 2 ? 20 : screenWidth - 80;
+
+    const snapped = {
+      x: snapX,
+      y: Math.max(20, Math.min(position.y, window.innerHeight - 120)),
+    };
+
+    setPosition(snapped);
+
+    // 🔥 SAVE POSITION
+    localStorage.setItem("floating-pos", JSON.stringify(snapped));
+  };
+
   return (
     <Box
+      onMouseMove={handleMove}
+      onMouseUp={handleEnd}
+      onTouchMove={handleMove}
+      onTouchEnd={handleEnd}
       style={{
         position: "fixed",
-        bottom: 25,
-        right: 25,
+        left: position.x ?? "auto",
+        top: position.y ?? "auto",
+        right: position.x === null ? 25 : "auto",
+        bottom: position.y === null ? 25 : "auto",
         zIndex: 2000,
+        touchAction: "none",
       }}
     >
       {/* 🔥 ONLINE BADGE */}
@@ -124,7 +176,7 @@ export default function FloatingContact() {
         Online
       </Badge>
 
-      {/* 🔥 OPTIONS */}
+      {/* 🔥 ACTIONS */}
       <Transition mounted={opened} transition="slide-up" duration={200}>
         {(styles) => (
           <Paper
@@ -175,14 +227,19 @@ export default function FloatingContact() {
           backgroundColor: "#4c6ef5",
           color: "white",
           boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-          animation: "pulse 2s infinite",
+          animation: dragging ? "none" : "pulse 2s infinite",
+          cursor: "grab",
         }}
-        onClick={() => setOpened((o) => !o)}
+        onMouseDown={handleStart}
+        onTouchStart={handleStart}
+        onClick={() => {
+          if (!dragging) setOpened((o) => !o);
+        }}
       >
         <IconMessageCircle size={28} />
       </ActionIcon>
 
-      {/* 🔥 SIMPLE PULSE ANIMATION */}
+      {/* 🔥 ANIMATION */}
       <style>
         {`
           @keyframes pulse {
