@@ -39,8 +39,6 @@ export default function AdminProducts() {
   const [imageFiles, setImageFiles] = useState([]);
   const [preview, setPreview] = useState([]);
 
-  const [heroTitle, setHeroTitle] = useState("");
-const [heroDesc, setHeroDesc] = useState("");
 
   const fetchProducts = () => {
     setLoading(true);
@@ -150,65 +148,7 @@ const [heroDesc, setHeroDesc] = useState("");
       <Title order={2} mb="lg">
   Product Management
 </Title>
-<Paper withBorder p="md" mb="lg" radius="md">
-  <Stack>
-    <Text fw={600} mb="xs">
-  Homepage Hero Content
-</Text>
 
-    <Textarea
-      label="Hero Title"
-      value={heroTitle}
-      onChange={(e) => setHeroTitle(e.target.value)}
-    />
-
-    <Textarea
-      label="Hero Description"
-      value={heroDesc}
-      onChange={(e) => setHeroDesc(e.target.value)}
-    />
-
-    <Button
-      onClick={async () => {
-        try {
-          await api.put(
-  "/api/content/hero_title",
-  { value: heroTitle },
-  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-await api.put(
-  "/api/content/hero_description",
-  { value: heroDesc },
-  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-          notifications.show({
-            title: "Saved",
-            message: "Homepage content updated",
-            color: "green",
-          });
-        } catch {
-          notifications.show({
-            title: "Error",
-            message: "Failed to update content",
-            color: "red",
-          });
-        }
-      }}
-    >
-      Save Content
-    </Button>
-  </Stack>
-</Paper>
 
       <Paper withBorder p="md">
         {loading ? (

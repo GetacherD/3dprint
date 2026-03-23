@@ -117,8 +117,8 @@ export default function FloatingContact() {
         size="xs"
         style={{
           position: "absolute",
-          top: -10,
-          right: 0,
+          top: -25,
+          right: 4,
         }}
       >
         Online

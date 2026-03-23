@@ -14,7 +14,7 @@ import Footer from "./components/Footer";
 // ✅ Mantine
 import { AppShell, Text } from "@mantine/core";
 import FloatingContact from "./components/FloatingContact";
-import AdminSettings from "./pages/AdminSettings";
+import AdminControlCenter from "./pages/AdminControlCenter";
 
 export default function App() {
   return (
@@ -60,11 +60,12 @@ export default function App() {
           />
 
           <Route path="/register" element={<Register />} />
-          <Route
-  path="/admin/settings"
+  
+<Route
+  path="/admin/control-center"
   element={
     <ProtectedRoute>
-      <AdminSettings />
+      <AdminControlCenter />
     </ProtectedRoute>
   }
 />
