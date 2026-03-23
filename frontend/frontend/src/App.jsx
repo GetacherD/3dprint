@@ -9,6 +9,7 @@ import ProtectedRoute from "./routes/ProtectedRout";
 import Navbar from "./components/Navbar";
 import AdminProducts from "./pages/AdminProducts";
 import Cart from "./pages/Cart";
+import Footer from "./components/Footer";
 
 // ✅ Mantine
 import { AppShell, Text } from "@mantine/core";
@@ -16,56 +17,57 @@ import { AppShell, Text } from "@mantine/core";
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppShell
-          header={{ height: 60 }}
-          footer={{ height: 50 }}
-          padding="md"
-        >
-          {/* 🔝 Navbar */}
-          <AppShell.Header>
-            <Navbar />
-          </AppShell.Header>
 
-          {/* 📄 Main Content */}
-          <AppShell.Main>
-            <Routes>
-              <Route path="/" element={<Products />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
+  <BrowserRouter>
 
-              <Route
-                path="/admin/products"
-                element={
-                  <ProtectedRoute>
-                    <AdminProducts />
-                  </ProtectedRoute>
-                }
-              />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
 
-              <Route
-                path="/admin/create-product"
-                element={
-                  <ProtectedRoute>
-                    <AdminCreateProduct />
-                  </ProtectedRoute>
-                }
-              />
+      {/* 🔝 Navbar */}
+      <Navbar />
 
-              <Route path="/register" element={<Register />} />
-            </Routes>
-          </AppShell.Main>
+      {/* 📄 Main Content */}
+     <div style={{ flex: 1, paddingBottom: "20px" }}>
+        <Routes>
+          <Route path="/" element={<Products />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
 
-          {/* 🔻 Footer */}
-          <AppShell.Footer>
-            <Text ta="center" size="sm" c="dimmed" py="md">
-              © {new Date().getFullYear()} Designed and Developed By{" "}
-              <strong>Getacher Demisse</strong>
-            </Text>
-          </AppShell.Footer>
-        </AppShell>
-      </BrowserRouter>
-    </AuthProvider>
+          <Route
+            path="/admin/products"
+            element={
+              <ProtectedRoute>
+                <AdminProducts />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/create-product"
+            element={
+              <ProtectedRoute>
+                <AdminCreateProduct />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </div>
+
+      {/* 🔻 Footer */}
+      <Footer />
+
+    </div>
+
+  </BrowserRouter>
+</AuthProvider>
+
   );
 }

@@ -23,6 +23,7 @@ import { CartContext } from "../context/CartContext";
 import { notifications } from "@mantine/notifications";
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
+import { getImageUrl } from "../utils/image";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -178,8 +179,8 @@ export default function ProductDetail() {
 
   const images =
     product.imageUrls?.length > 0
-      ? product.imageUrls
-      : [product.imageUrl];
+      ? product.imageUrls.map((url) => getImageUrl(url))
+      : [getImageUrl(product.imageUrl)];
 
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === images.length - 1;
@@ -215,7 +216,10 @@ export default function ProductDetail() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background: "#f8f9fa",
+                background: "white",
+                borderRadius: "12px",
+
+
               }}
               onMouseEnter={() => setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
@@ -294,40 +298,51 @@ export default function ProductDetail() {
               />
             </Paper>
           ) : (
-            <Stack>
-              <Title order={2}>{product.name}</Title>
+           <Paper withBorder p="lg" radius="lg">
+  <Stack gap="sm">
 
-              <Badge size="lg" color="blue">
-                {product.price} QAR
-              </Badge>
+    <Title order={2}>{product.name}</Title>
 
-              <Text c="dimmed">{product.description}</Text>
+    {/* 🔥 PRICE */}
+    <Text fw={800} size="xl" c="blue">
+      {product.price} QAR
+    </Text>
 
-              <Text size="sm">
-                Stock: {product.stockQuantity}
-              </Text>
+    <Text c="dimmed">{product.description}</Text>
 
-              <Button
-                onClick={handleAddToCart}
-                color={added ? "green" : "blue"}
-                disabled={added}
-              >
-                {added ? "Added ✓" : "Add to Cart"}
-              </Button>
+    <Text size="sm">
+      Stock: {product.stockQuantity}
+    </Text>
 
-              <Button variant="light" onClick={handleBuy}>
-                Buy Now
-              </Button>
+    {/* 🔥 ACTIONS */}
+    <Stack mt="md">
 
-              <Button
-                variant="outline"
-                onClick={() =>
-                  reviewRef.current.scrollIntoView({ behavior: "smooth" })
-                }
-              >
-                Write a Review
-              </Button>
-            </Stack>
+      <Button
+        size="md"
+        onClick={handleAddToCart}
+        color={added ? "green" : "blue"}
+        disabled={added}
+      >
+        {added ? "Added ✓" : "Add to Cart"}
+      </Button>
+
+      <Button variant="light" size="md" onClick={handleBuy}>
+        Buy Now
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={() =>
+          reviewRef.current.scrollIntoView({ behavior: "smooth" })
+        }
+      >
+        Write a Review
+      </Button>
+
+    </Stack>
+
+  </Stack>
+</Paper>
           )}
         </Grid.Col>
 
@@ -335,7 +350,7 @@ export default function ProductDetail() {
 
       {/* 🔥 REVIEW SECTION */}
       <div ref={reviewRef}>
-        <Divider my="xl" />
+        <Divider my="xl" label="Customer Reviews" />
 
         <Title order={3}>Customer Reviews</Title>
 
@@ -362,7 +377,7 @@ export default function ProductDetail() {
 
         {token && (
           <Paper withBorder p="md" mt="md">
-            <Stack>
+            <Stack >
               <Rating value={rating} onChange={setRating} />
 
               <Textarea
@@ -392,9 +407,17 @@ export default function ProductDetail() {
           </Text>
         )}
 
-        <Stack mt="md">
+        <Stack mt="lg">
           {sortedReviews.map((r) => (
-            <Paper key={r.id} p="md" withBorder>
+           <Paper
+  key={r.id}
+  p="md"
+  withBorder
+  radius="md"
+  style={{
+    background: "#ffffff",
+  }}
+>
 
               <Group justify="space-between">
                 <Text fw={500}>{r.userName}</Text>

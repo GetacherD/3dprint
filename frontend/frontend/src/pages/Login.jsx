@@ -34,7 +34,7 @@ export default function Login() {
 
   return (
     <Container size={420} my={60}>
-      <Title ta="center">Welcome back</Title>
+      <Title ta="center">Welcome Back</Title>
 
       <Paper withBorder shadow="md" p="lg" mt="md" radius="md">
         <Stack>

@@ -10,6 +10,7 @@ import {
   Image,
   Stack,
   Group,
+  Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
@@ -85,70 +86,93 @@ export default function AdminCreateProduct() {
       </Title>
 
       <Paper shadow="xl" radius="lg" p="lg" withBorder>
-        <Stack>
-          <TextInput
-            label="Product Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+       <Stack gap="lg">
 
-          <NumberInput
-            label="Price (QAR)"
-            value={price}
-            onChange={setPrice}
-            min={0}
-            required
-          />
+  {/* 🔹 PRODUCT INFO */}
+  <Paper withBorder p="md" radius="md">
+    <Stack>
+      <Text fw={600}>Product Information</Text>
 
-          <NumberInput
-            label="Stock Quantity"
-            value={stockQuantity}
-            onChange={setStockQuantity}
-            min={0}
-            required
-          />
+      <TextInput
+        label="Product Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
 
-          <Textarea
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+      <Group grow>
+        <NumberInput
+          label="Price (QAR)"
+          value={price}
+          onChange={setPrice}
+          min={0}
+          required
+        />
 
-          {/* 🔥 MULTIPLE FILE INPUT */}
-          <FileInput
-            label="Product Images"
-            multiple
-            accept="image/*"
-            onChange={(files) => {
-              if (!files) return;
+        <NumberInput
+          label="Stock Quantity"
+          value={stockQuantity}
+          onChange={setStockQuantity}
+          min={0}
+          required
+        />
+      </Group>
 
-              const fileArray = Array.isArray(files) ? files : [files];
+      <Textarea
+        label="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+    </Stack>
+  </Paper>
 
-              setImageFile(fileArray);
-              setPreview(fileArray.map((f) => URL.createObjectURL(f)));
-            }}
-          />
+  {/* 🔹 IMAGE UPLOAD */}
+  <Paper withBorder p="md" radius="md">
+    <Stack>
+      <Text fw={600}>Product Images</Text>
 
-          {/* 🔥 FIXED PREVIEW (MULTIPLE) */}
-          {preview.length > 0 && (
-            <Group>
-              {preview.map((img, i) => (
-                <Image
-                  key={i}
-                  src={img}
-                  width={80}
-                  height={80}
-                  radius="md"
-                />
-              ))}
-            </Group>
-          )}
+      <FileInput
+        label="Upload Images"
+        multiple
+        accept="image/*"
+        onChange={(files) => {
+          if (!files) return;
 
-          <Button loading={loading} onClick={handleSubmit}>
-            Create Product
-          </Button>
-        </Stack>
+          const fileArray = Array.isArray(files) ? files : [files];
+
+          setImageFile(fileArray);
+          setPreview(fileArray.map((f) => URL.createObjectURL(f)));
+        }}
+      />
+
+      {/* 🔥 PREVIEW GRID */}
+      {preview.length > 0 && (
+        <Group>
+          {preview.map((img, i) => (
+            <Image
+              key={i}
+              src={img}
+              width={80}
+              height={80}
+              radius="md"
+            />
+          ))}
+        </Group>
+      )}
+    </Stack>
+  </Paper>
+
+  {/* 🔹 ACTION */}
+  <Button
+    loading={loading}
+    size="md"
+    radius="md"
+    onClick={handleSubmit}
+  >
+    Create Product
+  </Button>
+
+</Stack>
       </Paper>
     </Container>
   );

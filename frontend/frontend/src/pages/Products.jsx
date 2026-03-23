@@ -25,6 +25,9 @@ export default function Products() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
+const [heroTitle, setHeroTitle] = useState("");
+const [heroDesc, setHeroDesc] = useState("");
+
   useEffect(() => {
     api.get("/api/products?page=0&size=50").then((res) => {
       const data = res.data.data.content;
@@ -32,6 +35,17 @@ export default function Products() {
       setFiltered(data);
       setLoading(false);
     });
+    
+  api.get("/api/content/hero_title")
+    .then(res => setHeroTitle(res.data.data))
+    .catch(() => setHeroTitle("3D Printing Marketplace"));
+
+  api.get("/api/content/hero_description")
+    .then(res => setHeroDesc(res.data.data))
+    .catch(() =>
+      setHeroDesc("Discover high-quality 3D printed products. Simple, fast, and reliable.")
+    );
+
   }, []);
 
   // 🔥 FILTER LOGIC
@@ -64,29 +78,42 @@ export default function Products() {
     <>
       {/* HERO */}
       <Box
-        style={{
-          background: "linear-gradient(135deg, #4c6ef5, #15aabf)",
-          color: "white",
-          padding: "60px 20px",
-          marginBottom: "30px",
-        }}
-      >
-        <Container size="lg">
-          <Stack gap="xs">
-            <Title order={1}>3D Printing Marketplace TMT</Title>
-            <Text size="lg">
-              Explore products freely. Login only when you're ready to buy.
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+
+  style={{
+    background: "linear-gradient(135deg, #4c6ef5, #15aabf)",
+    color: "white",
+    padding: "80px 20px",
+    marginBottom: "40px",
+  }}
+>
+  <Container size="lg">
+    <Stack gap="sm">
+      <Title order={1} fw={800}>
+  {heroTitle || "3D Printing Marketplace"}
+</Title>
+
+<Text size="lg" opacity={0.9}>
+  {heroDesc || "Discover high-quality 3D printed products. Simple, fast, and reliable."}
+</Text>
+    </Stack>
+  </Container>
+</Box>
 
       {/* FILTER BAR */}
-      <Container size="lg" mb="md">
-        <Group grow>
+     <Container size="lg" mb="xl">
+  <Box
+    style={{
+      background: "white",
+      padding: "20px",
+      borderRadius: "12px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    }}
+  >
+    <Group grow>
           <TextInput
             placeholder="Search products..."
             leftSection={<IconSearch size={16} />}
+            radius="md"
             value={search}
             onChange={(e) => {
               const value = e.target.value;
@@ -97,6 +124,7 @@ export default function Products() {
 
           <NumberInput
             placeholder="Min Price"
+            radius="md"
             value={minPrice}
             onChange={(value) => {
               setMinPrice(value);
@@ -106,15 +134,19 @@ export default function Products() {
 
           <NumberInput
             placeholder="Max Price"
+  radius="md"
             value={maxPrice}
             onChange={(value) => {
               setMaxPrice(value);
               applyFilter(search, minPrice, value);
             }}
           />
-        </Group>
-      </Container>
-
+       </Group>
+  </Box>
+</Container>
+<Title order={3} mb="md">
+  Products
+</Title>
       {/* PRODUCTS */}
       <Container size="lg">
         {loading ? (
