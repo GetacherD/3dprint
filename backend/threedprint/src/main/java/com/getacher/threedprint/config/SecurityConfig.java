@@ -4,6 +4,7 @@ import com.getacher.threedprint.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,6 +52,12 @@ public class SecurityConfig {
                                 "/uploads/**",
                                 "/api/products/**"
                         ).permitAll()
+
+                        // 🌍 PUBLIC CONTENT (READ)
+                        .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
+
+                        // 🔐 ADMIN CONTENT (WRITE)
+                        .requestMatchers(HttpMethod.PUT, "/api/content/**").hasRole("ADMIN")
                         // 🌍 PUBLIC - ONLY GET reviews
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/reviews/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/reviews/**").authenticated()
