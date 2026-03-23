@@ -1,6 +1,6 @@
 package com.getacher.threedprint.user.controller;
 
-import com.getacher.threedprint.common.response.ApiRespones;
+import com.getacher.threedprint.common.response.ApiResponse;
 import com.getacher.threedprint.user.dto.UserRequest;
 import com.getacher.threedprint.user.dto.UserResponse;
 import com.getacher.threedprint.user.service.UserService;
@@ -20,10 +20,10 @@ public class UserController {
     private  final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ApiRespones<UserResponse>> ceateUser (@Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> ceateUser (@Valid @RequestBody UserRequest userRequest) {
         UserResponse userResponse = userService.createUser(userRequest);
         return  ResponseEntity.ok(
-                ApiRespones.<UserResponse>builder()
+                ApiResponse.<UserResponse>builder()
                         .success(true)
                         .message("User created successfully")
                         .data(userResponse)

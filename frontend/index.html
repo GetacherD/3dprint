@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fusion Finds | 3D Printed & Curated Imports Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #F4F1DE;
+            color: #3D405B;
+            line-height: 1.5;
+        }
+
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+
+        /* Announcement Bar */
+        .announcement {
+            background: #E07A5F;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Header & Navigation */
+        .main-header {
+            background: white;
+            padding: 16px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background: #E07A5F;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3D405B;
+        }
+
+        .logo-text p {
+            font-size: 0.7rem;
+            color: #81B29A;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #3D405B;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #E07A5F;
+        }
+
+        .category-dropdown {
+            position: relative;
+        }
+
+        .category-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #3D405B;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-icons button, .nav-icons a {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #3D405B;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-icons button:hover, .nav-icons a:hover {
+            color: #E07A5F;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #E07A5F;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-btn {
+            background: #E07A5F;
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: #c25a3f;
+            color: white !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #F4F1DE 0%, #e8e4cf 100%);
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            color: #3D405B;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #5a5e7a;
+            margin-bottom: 30px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #81B29A;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            background: #E07A5F;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #c25a3f;
+            transform: translateY(-2px);
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            max-width: 1400px;
+            margin: 40px auto 20px;
+            padding: 0 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: none;
+            background: white;
+            color: #3D405B;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tab.active {
+            background: #E07A5F;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #81B29A;
+            color: white;
+        }
+
+        /* Search & Filter Bar */
+        .filter-bar {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px 40px;
+            background: white;
+            border-radius: 60px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: #F4F1DE;
+            border-radius: 40px;
+            padding: 8px 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-box button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .price-filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .price-filters input {
+            padding: 10px 15px;
+            border: 1px solid #E9ECEF;
+            border-radius: 30px;
+            width: 100px;
+            outline: none;
+        }
+
+        .apply-filter {
+            background: #81B29A;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        /* Products Grid */
+        .products-section {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h3 {
+            font-size: 1.5rem;
+            color: #3D405B;
+        }
+
+        .view-all {
+            color: #E07A5F;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            height: 240px;
+            background: #F4F1DE;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-3d {
+            background: #9D4EDD;
+        }
+
+        .badge-import {
+            background: #81B29A;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3D405B;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #E07A5F;
+            margin: 10px 0;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stars {
+            color: #F2CC8F;
+            letter-spacing: 2px;
+        }
+
+        .review-count {
+            color: #8e8ea8;
+            font-size: 0.8rem;
+        }
+
+        .product-description {
+            color: #6c6e8a;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: #E07A5F;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background: #c25a3f;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            background: #3D405B;
+            margin: 60px 40px 40px;
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .newsletter h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .newsletter p {
+            margin-bottom: 25px;
+            opacity: 0.8;
+        }
+
+        .newsletter-form {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .newsletter-form input {
+            padding: 14px 24px;
+            border-radius: 50px;
+            border: none;
+            width: 300px;
+            font-size: 1rem;
+        }
+
+        .newsletter-form button {
+            background: #E07A5F;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2D2F36;
+            color: #a0a0b0;
+            padding: 50px 40px 30px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #a0a0b0;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: #E07A5F;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid #404040;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-header {
+                padding: 16px 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .newsletter {
+                margin: 40px 20px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <div class="announcement">
+        🎉 Free shipping on orders over 500 QAR | New imported bamboo collection just arrived!
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="nav-container">
+            <div class="logo-area">
+                <div class="logo-icon">✨</div>
+                <div class="logo-text">
+                    <h1>Fusion Finds</h1>
+                    <p>3D PRINTED • CURATED IMPORTS</p>
+                </div>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <div class="category-dropdown">
+                    <button class="category-btn">Categories ▼</button>
+                </div>
+                <a href="#">Sell on Fusion</a>
+                <a href="#">About</a>
+            </div>
+            
+            <div class="nav-icons">
+                <button>🔍</button>
+                <div class="cart-icon">
+                    <button>🛒</button>
+                    <span class="cart-count">2</span>
+                </div>
+                <a href="#" class="login-btn">Login</a>
+                <a href="#">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">✨ NEW ARRIVALS ✨</span>
+            <h2>Discover Unique Designs</h2>
+            <p>From 3D-Printed Innovation to Timeless Craftsmanship. Explore thousands of unique products from local makers and global artisans.</p>
+            <button class="cta-button">Start Exploring →</button>
+        </div>
+    </section>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs">
+        <button class="tab active">All Products</button>
+        <button class="tab">🎨 3D Printed</button>
+        <button class="tab">🌿 Imported Crafts</button>
+        <button class="tab">🪑 Furniture</button>
+        <button class="tab">🧹 Home & Living</button>
+        <button class="tab">🍽️ Kitchen</button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <input type="text" placeholder="Search products..." id="searchInput">
+            <button>🔍</button>
+        </div>
+        <div class="price-filters">
+            <input type="number" placeholder="Min QAR" id="minPrice">
+            <input type="number" placeholder="Max QAR" id="maxPrice">
+            <button class="apply-filter" id="applyFilter">Apply</button>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-section">
+        <div class="section-header">
+            <h3>Featured Products</h3>
+            <a href="#" class="view-all">View All →</a>
+        </div>
+        
+        <div class="products-grid" id="productsGrid">
+            <!-- Product 1 - 3D Printed -->
+            <div class="product-card" data-category="3d" data-price="200">
+                <div class="product-image">
+                    🏺
+                    <span class="product-badge badge-3d">3D PRINTED</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Geometric Vase</div>
+                    <div class="product-price">200 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="review-count">(12 reviews)</span>
+                    </div>
+                    <div class="product-description">Precision 3D-printed geometric vase. Perfect for modern decor. Made from eco-friendly PLA filament.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 2 - 3D Printed -->
+            <div class="product-card" data-category="3d" data-price="1000">
+                <div class="product-image">
+                    🖨️
+                    <span class="product-badge badge-3d">3D PRINTED</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Pro Desktop Organizer</div>
+                    <div class="product-price">1,000 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="review-count">(8 reviews)</span>
+                    </div>
+                    <div class="product-description">Premium desk organizer with customizable compartments. Perfect for professionals and creators.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 3 - Imported -->
+            <div class="product-card" data-category="import" data-price="85">
+                <div class="product-image">
+                    🧹
+                    <span class="product-badge badge-import">IMPORTED CRAFT</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Bamboo Cleaning Brush Set</div>
+                    <div class="product-price">85 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="review-count">(24 reviews)</span>
+                    </div>
+                    <div class="product-description">Handcrafted bamboo brushes with natural bristles. Eco-friendly and biodegradable. Set of 3.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 4 - Imported -->
+            <div class="product-card" data-category="import" data-price="450">
+                <div class="product-image">
+                    🪑
+                    <span class="product-badge badge-import">IMPORTED CRAFT</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Minimalist Wooden Chair</div>
+                    <div class="product-price">450 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="review-count">(31 reviews)</span>
+                    </div>
+                    <div class="product-description">Handcrafted solid teak wood chair. Scandinavian design, perfect for modern homes.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 5 - 3D Printed -->
+            <div class="product-card" data-category="3d" data-price="122">
+                <div class="product-image">
+                    🎨
+                    <span class="product-badge badge-3d">3D PRINTED</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Test Sculpture Figure</div>
+                    <div class="product-price">122 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="review-count">(5 reviews)</span>
+                    </div>
+                    <div class="product-description">Artistic desk sculpture, fully customizable with different color options available.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 6 - Imported -->
+            <div class="product-card" data-category="import" data-price="180">
+                <div class="product-image">
+                    🍽️
+                    <span class="product-badge badge-import">IMPORTED CRAFT</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Ceramic Dinner Set</div>
+                    <div class="product-price">180 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="review-count">(42 reviews)</span>
+                    </div>
+                    <div class="product-description">Hand-painted ceramic dinner set. Microwave and dishwasher safe. Includes 4 plates, 4 bowls.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 7 - 3D Printed -->
+            <div class="product-card" data-category="3d" data-price="350">
+                <div class="product-image">
+                    💡
+                    <span class="product-badge badge-3d">3D PRINTED</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Lunar Lamp</div>
+                    <div class="product-price">350 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="review-count">(56 reviews)</span>
+                    </div>
+                    <div class="product-description">3D-printed moon lamp with 16 color options. Perfect night light or decor piece.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Product 8 - Imported -->
+            <div class="product-card" data-category="import" data-price="95">
+                <div class="product-image">
+                    🧺
+                    <span class="product-badge badge-import">IMPORTED CRAFT</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Woven Storage Basket</div>
+                    <div class="product-price">95 QAR</div>
+                    <div class="product-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="review-count">(18 reviews)</span>
+                    </div>
+                    <div class="product-description">Handwoven seagrass basket. Perfect for plant pots, toys, or laundry storage.</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter Section -->
+    <div class="newsletter">
+        <h3>✨ Get 10% Off Your First Order</h3>
+        <p>Subscribe to get exclusive offers, new product alerts, and design inspiration.</p>
+        <div class="newsletter-form">
+            <input type="email" placeholder="Enter your email address">
+            <button>Subscribe</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>Fusion Finds</h4>
+                <a href="#">About Us</a>
+                <a href="#">How It Works</a>
+                <a href="#">Sell on Fusion</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Shipping Information</a>
+                <a href="#">Returns & Exchanges</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>Policies</h4>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Payment Methods</a>
+                <a href="#">FAQs</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">Pinterest</a>
+                <a href="#">Facebook</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Fusion Finds. All rights reserved. Bridging 3D innovation with timeless craftsmanship.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple filter functionality
+        const applyFilterBtn = document.getElementById('applyFilter');
+        const searchInput = document.getElementById('searchInput');
+        const minPriceInput = document.getElementById('minPrice');
+        const maxPriceInput = document.getElementById('maxPrice');
+        const productCards = document.querySelectorAll('.product-card');
+        const tabs = document.querySelectorAll('.tab');
+        
+        let currentCategory = 'all';
+        
+        function filterProducts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const minPrice = parseFloat(minPriceInput.value) || 0;
+            const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+            
+            productCards.forEach(card => {
+                const title = card.querySelector('.product-title').textContent.toLowerCase();
+                const description = card.querySelector('.product-description').textContent.toLowerCase();
+                const price = parseFloat(card.getAttribute('data-price'));
+                const category = card.getAttribute('data-category');
+                
+                const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+                const matchesPrice = price >= minPrice && price <= maxPrice;
+                const matchesCategory = currentCategory === 'all' || category === currentCategory;
+                
+                if (matchesSearch && matchesPrice && matchesCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        applyFilterBtn.addEventListener('click', filterProducts);
+        searchInput.addEventListener('input', filterProducts);
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabText = tab.textContent;
+                if (tabText.includes('All')) {
+                    currentCategory = 'all';
+                } else if (tabText.includes('3D')) {
+                    currentCategory = '3d';
+                } else if (tabText.includes('Imported')) {
+                    currentCategory = 'import';
+                } else {
+                    currentCategory = 'all';
+                }
+                
+                filterProducts();
+            });
+        });
+        
+        // Add to cart functionality
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const cartCount = document.querySelector('.cart-count');
+        let cartItems = 2; // Starting with 2 items as shown in screenshot
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cartItems++;
+                cartCount.textContent = cartItems;
+                
+                // Optional: Show a subtle notification
+                button.textContent = '✓ Added!';
+                setTimeout(() => {
+                    button.textContent = 'Add to Cart';
+                }, 1500);
+            });
+        });
+        
+        // Product card click (for demo)
+        productCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('add-to-cart')) {
+                    alert('View product details: ' + card.querySelector('.product-title').textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

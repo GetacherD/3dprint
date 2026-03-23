@@ -1,6 +1,6 @@
 package com.getacher.threedprint.review.controller;
 
-import com.getacher.threedprint.common.response.ApiRespones;
+import com.getacher.threedprint.common.response.ApiResponse;
 import com.getacher.threedprint.review.dto.ReviewRequest;
 import com.getacher.threedprint.review.dto.ReviewResponse;
 import com.getacher.threedprint.review.service.ReviewService;
@@ -20,11 +20,11 @@ public class ReviewController {
 
     // 🔥 CREATE REVIEW (AUTH REQUIRED)
     @PostMapping
-    public ResponseEntity<ApiRespones<ReviewResponse>> createReview(
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @Valid @RequestBody ReviewRequest request
     ) {
         return ResponseEntity.ok(
-                ApiRespones.<ReviewResponse>builder()
+                ApiResponse.<ReviewResponse>builder()
                         .success(true)
                         .message("Review created")
                         .data(reviewService.createReview(request))
@@ -34,23 +34,23 @@ public class ReviewController {
 
     // 🌍 PUBLIC - GET REVIEWS BY PRODUCT
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiRespones<List<ReviewResponse>>> getReviews(
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviews(
             @PathVariable Long productId
     ) {
         return ResponseEntity.ok(
-                ApiRespones.<List<ReviewResponse>>builder()
+                ApiResponse.<List<ReviewResponse>>builder()
                         .success(true)
                         .data(reviewService.getReviewsByProduct(productId))
                         .build()
         );
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ApiRespones<ReviewResponse>> updateReview(
+    public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
             @Valid @RequestBody ReviewRequest request
     ) {
         return ResponseEntity.ok(
-                ApiRespones.<ReviewResponse>builder()
+                ApiResponse.<ReviewResponse>builder()
                         .success(true)
                         .message("Review updated")
                         .data(reviewService.updateReview(id, request))

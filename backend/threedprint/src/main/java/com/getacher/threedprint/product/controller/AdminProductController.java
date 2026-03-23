@@ -1,7 +1,7 @@
 package com.getacher.threedprint.product.controller;
 
 
-import com.getacher.threedprint.common.response.ApiRespones;
+import com.getacher.threedprint.common.response.ApiResponse;
 import com.getacher.threedprint.product.dto.ProductRequest;
 import com.getacher.threedprint.product.dto.ProductResponse;
 import com.getacher.threedprint.product.service.ProductService;
@@ -21,11 +21,11 @@ public class AdminProductController {
 
     // 🔐 ADMIN
     @PostMapping
-    public ResponseEntity<ApiRespones<ProductResponse>> createProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @RequestBody ProductRequest request
     ) {
         return ResponseEntity.ok(
-                ApiRespones.<ProductResponse>builder()
+                ApiResponse.<ProductResponse>builder()
                         .success(true)
                         .message("Product created")
                         .data(productService.createProduct(request))
@@ -34,13 +34,13 @@ public class AdminProductController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<ApiRespones<String>> uploadImage(
+    public ResponseEntity<ApiResponse<String>> uploadImage(
             @RequestParam("file") MultipartFile file
     ) {
         String imageUrl = productService.uploadImage(file);
 
         return ResponseEntity.ok(
-                ApiRespones.<String>builder()
+                ApiResponse.<String>builder()
                         .success(true)
                         .message("Image uploaded")
                         .data(imageUrl)
@@ -49,12 +49,12 @@ public class AdminProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiRespones<ProductResponse>> updateProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request
     ) {
         return ResponseEntity.ok(
-                ApiRespones.<ProductResponse>builder()
+                ApiResponse.<ProductResponse>builder()
                         .success(true)
                         .message("Product updated")
                         .data(productService.updateProduct(id, request))
@@ -62,25 +62,25 @@ public class AdminProductController {
         );
     }
     @DeleteMapping("/{id}/image")
-    public ResponseEntity<ApiRespones<Void>> deleteImage(
+    public ResponseEntity<ApiResponse<Void>> deleteImage(
             @PathVariable Long id,
             @RequestParam String imageUrl
     ) {
         productService.deleteProductImage(id, imageUrl);
 
         return ResponseEntity.ok(
-                ApiRespones.<Void>builder()
+                ApiResponse.<Void>builder()
                         .success(true)
                         .message("Image removed")
                         .build()
         );
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiRespones<Void>> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
 
         return ResponseEntity.ok(
-                ApiRespones.<Void>builder()
+                ApiResponse.<Void>builder()
                         .success(true)
                         .message("Product deleted")
                         .build()
