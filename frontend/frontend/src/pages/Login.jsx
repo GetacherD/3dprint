@@ -8,6 +8,7 @@ import {
   Text,
   Anchor,
   Stack,
+  Box,
 } from "@mantine/core";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -33,38 +34,54 @@ export default function Login() {
   };
 
   return (
-    <Container size={420} my={60}>
-      <Title ta="center">Welcome Back</Title>
+    <Box style={{ background: "var(--bg-primary)", minHeight: "100vh", padding: "24px 12px" }}>
+      <Container size={420} my={40}>
+        <Paper
+          withBorder
+          shadow="md"
+          p="xl"
+          radius="var(--radius-lg)"
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "var(--shadow-md)" }}
+        >
+          <Stack gap="md">
+            <Box ta="center" mb={4}>
+              <Title order={2} c="var(--text-primary)">Welcome Back</Title>
+              <Text size="sm" c="var(--text-secondary)" mt={6}>Sign in to continue shopping</Text>
+            </Box>
 
-      <Paper withBorder shadow="md" p="lg" mt="md" radius="md">
-        <Stack>
-          <TextInput
-            label="Email"
-            placeholder="your@email.com"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+            <TextInput
+              label="Email"
+              placeholder="your@email.com"
+              onChange={(e) => setEmail(e.target.value)}
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+            />
 
-          <PasswordInput
-            label="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <PasswordInput
+              label="Password"
+              onChange={(e) => setPassword(e.target.value)}
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+            />
 
-          <Button fullWidth mt="md" size="md" onClick={handleLogin}>
-            Sign in
-          </Button>
-
-          {/* 🔥 REGISTER LINK */}
-          <Text size="sm" ta="center" mt="sm">
-            Don’t have an account?{" "}
-            <Anchor
-              component="button"
-              onClick={() => navigate("/register")}
+            <Button
+              fullWidth
+              mt="sm"
+              size="md"
+              radius="xl"
+              onClick={handleLogin}
+              style={{ background: "var(--primary)", color: "#fff", boxShadow: "var(--shadow-sm)", fontWeight: 700 }}
             >
-              Create one
-            </Anchor>
-          </Text>
-        </Stack>
-      </Paper>
-    </Container>
+              Sign in
+            </Button>
+
+            <Text size="sm" ta="center" mt="xs" c="var(--text-secondary)">
+              Don’t have an account?{" "}
+              <Anchor component="button" onClick={() => navigate("/register")} c="var(--primary)" fw={600}>
+                Create one
+              </Anchor>
+            </Text>
+          </Stack>
+        </Paper>
+      </Container>
+    </Box>
   );
 }

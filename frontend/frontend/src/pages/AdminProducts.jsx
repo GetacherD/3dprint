@@ -304,16 +304,27 @@ export default function AdminProducts() {
 
   return (
     <Container size="lg">
-      <Title mb="lg">Product Management</Title>
+      <Title mb="lg" c="var(--text-primary)">Product Management</Title>
 
-      <Paper withBorder p="md">
+      <Paper
+        withBorder
+        p="md"
+        radius="var(--radius-lg)"
+        style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "var(--shadow-sm)" }}
+      >
         {loading ? (
           <Center><Loader /></Center>
         ) : (
-          <SimpleGrid cols={4}>
+          <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 4 }} spacing="md">
             {products.map((p) => (
-              <Paper key={p.id} withBorder p="sm">
-                <Image src={getImageUrl(p.imageUrl)} height={150} />
+              <Paper
+                key={p.id}
+                withBorder
+                p="sm"
+                radius="var(--radius-md)"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <Image src={getImageUrl(p.imageUrl)} height={150} radius="var(--radius-sm)" />
                 <Text fw={600}>{p.name}</Text>
 
                 {p.categoryName && (
@@ -321,7 +332,12 @@ export default function AdminProducts() {
                 )}
 
                 <Group mt="sm" justify="space-between">
-                  <Button size="xs" onClick={() => openEdit(p)}>
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    style={{ background: "var(--primary)", color: "#fff", fontWeight: 700 }}
+                    onClick={() => openEdit(p)}
+                  >
                     Edit
                   </Button>
 
@@ -339,7 +355,14 @@ export default function AdminProducts() {
         )}
       </Paper>
 
-      <Modal opened={opened} onClose={() => setOpened(false)} title="Edit Product">
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Edit Product"
+        radius="var(--radius-lg)"
+        centered
+        size="lg"
+      >
         <Stack>
 
           <TextInput
@@ -348,6 +371,7 @@ export default function AdminProducts() {
             onChange={(e) =>
               setSelected((prev) => ({ ...prev, name: e.target.value }))
             }
+            styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
           />
 
           <Textarea
@@ -356,6 +380,7 @@ export default function AdminProducts() {
             onChange={(e) =>
               setSelected((prev) => ({ ...prev, description: e.target.value }))
             }
+            styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
           />
 
           <Group grow>
@@ -365,6 +390,7 @@ export default function AdminProducts() {
               onChange={(value) =>
                 setSelected((prev) => ({ ...prev, price: value }))
               }
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
             />
 
             <NumberInput
@@ -373,6 +399,7 @@ export default function AdminProducts() {
               onChange={(value) =>
                 setSelected((prev) => ({ ...prev, stockQuantity: value }))
               }
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
             />
           </Group>
 
@@ -381,6 +408,7 @@ export default function AdminProducts() {
             data={categories}
             value={categoryId}
             onChange={setCategoryId}
+            styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
           />
 
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -396,9 +424,18 @@ export default function AdminProducts() {
             </SortableContext>
           </DndContext>
 
-          <FileInput multiple onChange={handleAddImages} />
+          <FileInput
+            multiple
+            onChange={handleAddImages}
+            styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+          />
 
-          <Button onClick={handleUpdate} disabled={isUploading}>
+          <Button
+            radius="xl"
+            style={{ background: "var(--primary)", color: "#fff", fontWeight: 700 }}
+            onClick={handleUpdate}
+            disabled={isUploading}
+          >
             {isUploading ? "Uploading..." : "Save Changes"}
           </Button>
 

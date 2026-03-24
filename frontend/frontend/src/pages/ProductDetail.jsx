@@ -14,6 +14,7 @@ import {
   Divider,
   Group,
   Select,
+  Box,
 } from "@mantine/core";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext, useRef } from "react";
@@ -157,9 +158,11 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <Container size="lg">
-        <Skeleton height={450} />
-      </Container>
+      <Box style={{ background: "var(--bg-primary)", minHeight: "100vh", padding: "24px 12px" }}>
+        <Container size="lg">
+          <Skeleton height={450} radius="var(--radius-lg)" />
+        </Container>
+      </Box>
     );
   }
 
@@ -186,12 +189,19 @@ export default function ProductDetail() {
   });
 
   return (
+    <Box style={{ background: "var(--bg-primary)", minHeight: "100vh", padding: "18px 0 32px" }}>
     <Container size="lg" my="xl">
       <Grid gutter="xl">
 
         {/* IMAGE */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Paper shadow="md" radius="lg" p="sm" withBorder>
+          <Paper
+            shadow="md"
+            radius="lg"
+            p="sm"
+            withBorder
+            style={{ borderColor: "var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}
+          >
 
             <div
               onClick={() => setFullscreen(!fullscreen)}
@@ -202,6 +212,7 @@ export default function ProductDetail() {
                 position: "relative",
                 overflow: "hidden",
                 cursor: "zoom-in",
+                borderRadius: "var(--radius-md)",
               }}
               onMouseEnter={() => setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
@@ -216,16 +227,20 @@ export default function ProductDetail() {
                 withIndicators
                 onSlideChange={setActiveIndex}
                 withControls={images.length > 1}
-                nextControlProps={{
-                  style: {
-                    opacity: isLast ? 0.3 : 1,
-                    pointerEvents: isLast ? "none" : "auto",
-                  },
-                }}
                 previousControlProps={{
                   style: {
                     opacity: isFirst ? 0.3 : 1,
                     pointerEvents: isFirst ? "none" : "auto",
+                    background: "var(--primary)",
+                    color: "#fff",
+                  },
+                }}
+                nextControlProps={{
+                  style: {
+                    opacity: isLast ? 0.3 : 1,
+                    pointerEvents: isLast ? "none" : "auto",
+                    background: "var(--primary)",
+                    color: "#fff",
                   },
                 }}
               >
@@ -247,7 +262,7 @@ export default function ProductDetail() {
         {/* RIGHT */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           {isZooming ? (
-            <Paper p="sm" style={{ height: 450 }}>
+            <Paper p="sm" style={{ height: 450, borderRadius: "var(--radius-lg)" }}>
               <div
                 style={{
                   width: "100%",
@@ -255,17 +270,24 @@ export default function ProductDetail() {
                   backgroundImage: `url(${images[activeIndex]})`,
                   backgroundSize: "180%",
                   backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                  borderRadius: "var(--radius-md)",
                 }}
               />
             </Paper>
           ) : (
-            <Paper p="lg">
-              <Stack>
+            <Paper
+              p="lg"
+              withBorder
+              style={{ borderColor: "var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}
+            >
+              <Stack gap="sm">
 
-                <Title>{product.name}</Title>
+                <Title order={2} style={{ color: "var(--text-primary)", lineHeight: 1.2 }}>{product.name}</Title>
 
                 {product.categoryName && (
-                  <Badge>{product.categoryName}</Badge>
+                  <Badge style={{ borderRadius: "var(--radius-pill)", background: "var(--secondary)", color: "#fff" }}>
+                    {product.categoryName}
+                  </Badge>
                 )}
 
                 <Group>
@@ -273,15 +295,24 @@ export default function ProductDetail() {
                   <Text size="sm">({reviews.length})</Text>
                 </Group>
 
-                <Text fw={800}>{product.price} QAR</Text>
+                <Text fw={800} size="xl" c="var(--primary)">{product.price} QAR</Text>
 
-                <Text>{product.description}</Text>
+                <Text c="var(--text-primary)">{product.description}</Text>
 
-                <Text>Stock: {product.stockQuantity}</Text>
+                <Text c="var(--text-secondary)">Stock: {product.stockQuantity}</Text>
 
                 <Button
                   onClick={handleAddToCart}
                   disabled={outOfStock || added}
+                  fullWidth
+                  radius="xl"
+                  style={{
+                    background: outOfStock ? "#9aa2ad" : added ? "var(--secondary)" : "var(--primary)",
+                    color: "#fff",
+                    boxShadow: "var(--shadow-sm)",
+                    border: "none",
+                    fontWeight: 700,
+                  }}
                 >
                   {outOfStock
                     ? "Out of Stock"
@@ -290,12 +321,21 @@ export default function ProductDetail() {
                     : "Add to Cart"}
                 </Button>
 
-                <Button variant="light" onClick={handleBuy}>
+                <Button
+                  variant="light"
+                  fullWidth
+                  radius="xl"
+                  onClick={handleBuy}
+                  style={{ color: "var(--text-primary)", fontWeight: 600 }}
+                >
                   Buy Now
                 </Button>
 
                 <Button
                   variant="outline"
+                  fullWidth
+                  radius="xl"
+                  style={{ color: "var(--text-primary)", borderColor: "var(--border)", fontWeight: 600 }}
                   onClick={() =>
                     reviewRef.current.scrollIntoView({
                       behavior: "smooth",
@@ -315,10 +355,10 @@ export default function ProductDetail() {
       <div ref={reviewRef}>
         <Divider my="xl" label="Customer Reviews" />
 
-        <Title order={3}>Customer Reviews</Title>
+        <Title order={3} mb="sm" c="var(--text-primary)">Customer Reviews</Title>
 
         {reviews.length === 0 && (
-          <Text c="dimmed">No reviews yet</Text>
+          <Text c="var(--text-secondary)">No reviews yet</Text>
         )}
 
         <Select
@@ -329,21 +369,27 @@ export default function ProductDetail() {
             { value: "highest", label: "Highest" },
             { value: "lowest", label: "Lowest" },
           ]}
+          mb="md"
+          styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
         />
 
         {token && (
-          <Paper p="md">
+          <Paper p="md" withBorder style={{ borderColor: "var(--border)", borderRadius: "var(--radius-lg)" }}>
             <Stack>
               <Rating value={rating} onChange={setRating} />
-              <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+              />
 
               <Group>
-                <Button onClick={handleSubmitReview}>
+                <Button onClick={handleSubmitReview} radius="xl" style={{ background: "var(--primary)", color: "#fff" }}>
                   {myReview ? "Update" : "Submit"}
                 </Button>
 
                 {myReview && (
-                  <Button color="red" onClick={handleDeleteReview}>
+                  <Button color="red" radius="xl" onClick={handleDeleteReview}>
                     Delete
                   </Button>
                 )}
@@ -354,26 +400,27 @@ export default function ProductDetail() {
 
         <Stack mt="lg">
           {sortedReviews.map((r) => (
-            <Paper key={r.id} p="md">
+            <Paper key={r.id} p="md" withBorder style={{ borderColor: "var(--border)", borderRadius: "var(--radius-lg)" }}>
               <Group justify="space-between">
                 <Group>
-                  <Text>{r.userName}</Text>
+                  <Text fw={600}>{r.userName}</Text>
                   {r.userName === myReview?.userName && (
-                    <Badge size="xs">You</Badge>
+                    <Badge size="xs" style={{ borderRadius: "var(--radius-pill)", background: "var(--primary)", color: "#fff" }}>You</Badge>
                   )}
                 </Group>
                 <Rating value={r.rating} readOnly />
               </Group>
 
-              <Text size="xs">
+              <Text size="xs" c="var(--text-secondary)">
                 {new Date(r.createdAt).toLocaleString()}
               </Text>
 
-              <Text>{r.comment}</Text>
+              <Text c="var(--text-primary)">{r.comment}</Text>
             </Paper>
           ))}
         </Stack>
       </div>
     </Container>
+    </Box>
   );
 }

@@ -1,6 +1,7 @@
 import {
   Container,
   Title,
+  Divider,
   TextInput,
   NumberInput,
   Textarea,
@@ -171,24 +172,52 @@ export default function AdminCreateProduct() {
     }
   };
 
+  const fieldStyles = {
+    input: {
+      borderRadius: "var(--radius-md)",
+      borderColor: "var(--border)",
+      background: "#fff",
+    },
+  };
+
   return (
-    <Container size={500} my={40}>
-      <Title order={2} mb="md">
+    <Container size="md" my="md" px={0}>
+      <Title order={2} mb={4} c="var(--text-primary)">
         Create New Product
       </Title>
+      <Text size="sm" c="dimmed" mb="lg">
+        Add product details, upload gallery images, and publish to catalog.
+      </Text>
 
-      <Paper shadow="xl" radius="lg" p="lg" withBorder>
+      <Paper
+        shadow="xl"
+        radius="var(--radius-lg)"
+        p={{ base: "md", sm: "lg" }}
+        withBorder
+        style={{
+          borderColor: "var(--border)",
+          background: "var(--bg-card)",
+          boxShadow: "var(--shadow-md)",
+        }}
+      >
         <Stack gap="lg">
 
-          <Paper withBorder p="md" radius="md">
+          <Paper
+            withBorder
+            p="md"
+            radius="var(--radius-md)"
+            style={{ borderColor: "var(--border)", background: "#fff" }}
+          >
             <Stack>
-              <Text fw={600}>Product Information</Text>
+              <Text fw={700} c="var(--text-primary)">Product Information</Text>
+              <Divider color="var(--border)" />
 
               <TextInput
                 label="Product Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                styles={fieldStyles}
               />
 
               <Select
@@ -197,6 +226,7 @@ export default function AdminCreateProduct() {
                 value={categoryId}
                 onChange={setCategoryId}
                 required
+                styles={fieldStyles}
               />
 
               <Group grow>
@@ -206,6 +236,7 @@ export default function AdminCreateProduct() {
                   onChange={setPrice}
                   min={0}
                   required
+                  styles={fieldStyles}
                 />
 
                 <NumberInput
@@ -214,6 +245,7 @@ export default function AdminCreateProduct() {
                   onChange={setStockQuantity}
                   min={0}
                   required
+                  styles={fieldStyles}
                 />
               </Group>
 
@@ -221,25 +253,46 @@ export default function AdminCreateProduct() {
                 label="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                minRows={3}
+                autosize
+                styles={fieldStyles}
               />
             </Stack>
           </Paper>
 
-          <Paper withBorder p="md" radius="md">
+          <Paper
+            withBorder
+            p="md"
+            radius="var(--radius-md)"
+            style={{ borderColor: "var(--border)", background: "#fff" }}
+          >
             <Stack>
-              <Text fw={600}>Product Images</Text>
+              <Text fw={700} c="var(--text-primary)">Product Images</Text>
+              <Divider color="var(--border)" />
 
               <FileInput
+                label="Upload images"
                 multiple
                 accept="image/*"
                 onChange={handleAddImages}
+                clearable
+                styles={fieldStyles}
               />
 
               {images.length > 0 && (
-                <Group>
+                <Group gap="sm" wrap="wrap">
                   {images.map((img) => (
-                    <div key={img.id} style={{ position: "relative" }}>
-                      <Image src={img.url} width={80} height={80} />
+                    <div
+                      key={img.id}
+                      style={{
+                        position: "relative",
+                        padding: 6,
+                        borderRadius: 10,
+                        border: "1px solid var(--border)",
+                        background: "#fff",
+                      }}
+                    >
+                      <Image src={img.url} width={84} height={84} radius="var(--radius-sm)" />
 
                       <ActionIcon
                         color="red"
@@ -275,6 +328,15 @@ export default function AdminCreateProduct() {
           <Button
             loading={loading}
             disabled={isUploading}
+            radius="xl"
+            size="md"
+            fullWidth
+            style={{
+              background: "var(--primary)",
+              color: "#fff",
+              boxShadow: "var(--shadow-sm)",
+              fontWeight: 700,
+            }}
             onClick={handleSubmit}
           >
             {isUploading ? "Uploading..." : "Create Product"}

@@ -69,7 +69,7 @@ export default function FloatingContact() {
     {
       key: "phone",
       icon: <IconPhone size={20} />,
-      color: "teal",
+      color: "var(--secondary)",
       label: "Call",
       action: () => open(`tel:${contact.contact_phone}`),
       show: contact.contact_phone,
@@ -77,7 +77,7 @@ export default function FloatingContact() {
     {
       key: "whatsapp",
       icon: <IconBrandWhatsapp size={20} />,
-      color: "green",
+      color: "#25D366",
       label: "WhatsApp",
       action: () =>
         open(
@@ -88,7 +88,7 @@ export default function FloatingContact() {
     {
       key: "telegram",
       icon: <IconBrandTelegram size={20} />,
-      color: "blue",
+      color: "#2AABEE",
       label: "Telegram",
       action: () => open(`https://t.me/${contact.contact_telegram}`),
       show: contact.contact_telegram,
@@ -96,7 +96,7 @@ export default function FloatingContact() {
     {
       key: "email",
       icon: <IconMail size={20} />,
-      color: "gray",
+      color: "var(--primary)",
       label: "Email",
       action: () => open(`mailto:${contact.contact_email}`),
       show: contact.contact_email,
@@ -171,6 +171,8 @@ export default function FloatingContact() {
           position: "absolute",
           top: -25,
           right: 4,
+          borderRadius: "var(--radius-pill)",
+          boxShadow: "var(--shadow-sm)",
         }}
       >
         Online
@@ -184,8 +186,11 @@ export default function FloatingContact() {
               ...styles,
               marginBottom: 10,
               padding: 10,
-              borderRadius: 12,
-              boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+              borderRadius: "var(--radius-lg)",
+              boxShadow: "var(--shadow-lg)",
+              border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.96)",
+              backdropFilter: "blur(8px)",
             }}
           >
             <Stack gap={8}>
@@ -204,7 +209,7 @@ export default function FloatingContact() {
                           <ActionIcon
                             size={40}
                             radius="xl"
-                            color={a.color}
+                            style={{ background: a.color, color: "#fff" }}
                             onClick={a.action}
                           >
                             {a.icon}
@@ -224,11 +229,12 @@ export default function FloatingContact() {
         size={60}
         radius="xl"
         style={{
-          backgroundColor: "#4c6ef5",
+          backgroundColor: "var(--primary)",
           color: "white",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+          boxShadow: "var(--shadow-lg)",
           animation: dragging ? "none" : "pulse 2s infinite",
           cursor: "grab",
+          border: "2px solid #fff",
         }}
         onMouseDown={handleStart}
         onTouchStart={handleStart}

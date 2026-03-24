@@ -8,6 +8,7 @@ import {
   Text,
   Anchor,
   Stack,
+  Box,
 } from "@mantine/core";
 import { useState } from "react";
 import api from "../api/axios";
@@ -37,46 +38,66 @@ export default function Register() {
   };
 
   return (
-    <Container size={420} my={60}>
-      <Title ta="center">Create account</Title>
+    <Box style={{ background: "var(--bg-primary)", minHeight: "100vh", padding: "24px 12px" }}>
+      <Container size={420} my={40}>
+        <Paper
+          withBorder
+          shadow="md"
+          p="xl"
+          radius="var(--radius-lg)"
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "var(--shadow-md)" }}
+        >
+          <Stack gap="md">
+            <Box ta="center" mb={4}>
+              <Title order={2} c="var(--text-primary)">Create account</Title>
+              <Text size="sm" c="var(--text-secondary)" mt={6}>Join 3D Market in seconds</Text>
+            </Box>
 
-      <Paper withBorder shadow="md" p="lg" mt="md" radius="md">
-        <Stack>
-          <TextInput
-            label="Name"
-            placeholder="Your name"
-            onChange={(e) => setName(e.target.value)}
-          />
+            <TextInput
+              label="Name"
+              placeholder="Your name"
+              onChange={(e) => setName(e.target.value)}
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+            />
 
-          <TextInput
-            label="Email"
-            placeholder="your@email.com"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+            <TextInput
+              label="Email"
+              placeholder="your@email.com"
+              onChange={(e) => setEmail(e.target.value)}
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+            />
 
-          <PasswordInput
-            label="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <PasswordInput
+              label="Password"
+              onChange={(e) => setPassword(e.target.value)}
+              styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
+            />
 
-          <Button fullWidth mt="md" size="md" onClick={handleRegister}>
-            Sign up
-          </Button>
-
-          {/* 🔥 LOGIN LINK */}
-          <Text size="sm" ta="center" mt="sm">
-            Already have an account?{" "}
-            <Anchor
-              component="button"
-              onClick={() => navigate("/login")}
-              fw={500}
-              c="blue"
+            <Button
+              fullWidth
+              mt="sm"
+              size="md"
+              radius="xl"
+              onClick={handleRegister}
+              style={{ background: "var(--primary)", color: "#fff", boxShadow: "var(--shadow-sm)", fontWeight: 700 }}
             >
-              Sign in
-            </Anchor>
-          </Text>
-        </Stack>
-      </Paper>
-    </Container>
+              Sign up
+            </Button>
+
+            <Text size="sm" ta="center" mt="xs" c="var(--text-secondary)">
+              Already have an account?{" "}
+              <Anchor
+                component="button"
+                onClick={() => navigate("/login")}
+                fw={600}
+                c="var(--primary)"
+              >
+                Sign in
+              </Anchor>
+            </Text>
+          </Stack>
+        </Paper>
+      </Container>
+    </Box>
   );
 }

@@ -4,6 +4,8 @@ import {
   Paper,
   Tabs,
   Stack,
+  Text,
+  Divider,
   TextInput,
   Textarea,
   Button,
@@ -122,13 +124,25 @@ export default function AdminControlCenter() {
 
   return (
     <Container size="lg" my="xl">
-      <Title mb="lg">Admin Control Center</Title>
+      <Title order={1} mb={4} c="var(--text-primary)">Admin Control Center</Title>
+      <Text size="sm" c="dimmed" mb="lg">
+        Manage storefront content, categories, and product catalog from one place.
+      </Text>
 
-      <Paper p="lg" withBorder>
+      <Paper
+        p={{ base: "md", sm: "lg" }}
+        withBorder
+        radius="var(--radius-lg)"
+        style={{
+          borderColor: "var(--border)",
+          background: "var(--bg-card)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
 
-        <Tabs defaultValue="hero">
+        <Tabs defaultValue="hero" variant="pills" radius="xl">
 
-          <Tabs.List>
+          <Tabs.List grow style={{ borderBottom: "1px solid var(--border)", marginBottom: 10, paddingBottom: 10 }}>
             <Tabs.Tab value="hero">Hero</Tabs.Tab>
             <Tabs.Tab value="contact">Contact</Tabs.Tab>
             <Tabs.Tab value="category">Categories</Tabs.Tab>
@@ -139,7 +153,10 @@ export default function AdminControlCenter() {
 
           {/* 🔥 HERO FULL */}
           <Tabs.Panel value="hero" pt="md">
+            <Paper withBorder p="md" radius="var(--radius-md)" style={{ borderColor: "var(--border)", background: "#fff" }}>
             <Stack>
+              <Text fw={700} c="var(--text-primary)">Hero Section Content</Text>
+              <Divider color="var(--border)" />
 
               <Textarea
                 label="Hero Title"
@@ -147,6 +164,7 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, hero_title: e.target.value })
                 }
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
               <Textarea
@@ -155,14 +173,20 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, hero_description: e.target.value })
                 }
+                minRows={4}
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
             </Stack>
+            </Paper>
           </Tabs.Panel>
 
           {/* 🔥 CONTACT FULL */}
           <Tabs.Panel value="contact" pt="md">
+            <Paper withBorder p="md" radius="var(--radius-md)" style={{ borderColor: "var(--border)", background: "#fff" }}>
             <Stack>
+              <Text fw={700} c="var(--text-primary)">Contact Information</Text>
+              <Divider color="var(--border)" />
 
               <TextInput
                 label="WhatsApp"
@@ -170,6 +194,7 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, contact_whatsapp: e.target.value })
                 }
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
               <TextInput
@@ -178,6 +203,7 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, contact_email: e.target.value })
                 }
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
               <TextInput
@@ -186,6 +212,7 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, contact_phone: e.target.value })
                 }
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
               <TextInput
@@ -194,29 +221,35 @@ export default function AdminControlCenter() {
                 onChange={(e) =>
                   setForm({ ...form, contact_telegram: e.target.value })
                 }
+                styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
               />
 
             </Stack>
+            </Paper>
           </Tabs.Panel>
 
           {/* 🔥 CATEGORY */}
           <Tabs.Panel value="category" pt="md">
+            <Paper withBorder p="md" radius="var(--radius-md)" style={{ borderColor: "var(--border)", background: "#fff" }}>
             <Stack>
+              <Text fw={700} c="var(--text-primary)">Category Management</Text>
+              <Divider color="var(--border)" />
 
-              <Group>
+              <Group align="flex-end" wrap="wrap">
                 <TextInput
                   placeholder="New category"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
+                  styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
                 />
-                <Button onClick={handleCreateCategory}>Add</Button>
+                <Button radius="xl" onClick={handleCreateCategory} style={{ background: "var(--primary)", color: "#fff", fontWeight: 700 }}>Add</Button>
               </Group>
 
               {categories.map((c) => {
                 const used = categoryUsage[c.id] > 0;
 
                 return (
-                  <Group key={c.id} justify="space-between">
+                  <Group key={c.id} justify="space-between" align="flex-end" wrap="wrap">
 
                     <TextInput
                       value={c.name}
@@ -228,12 +261,15 @@ export default function AdminControlCenter() {
                           )
                         );
                       }}
+                      styles={{ input: { borderRadius: "var(--radius-md)", borderColor: "var(--border)" } }}
                     />
 
                     <Group>
 
                       <Button
                         size="xs"
+                        radius="xl"
+                        style={{ fontWeight: 600 }}
                         onClick={() => handleUpdateCategory(c.id, c.name)}
                       >
                         Save
@@ -263,6 +299,7 @@ export default function AdminControlCenter() {
               })}
 
             </Stack>
+            </Paper>
           </Tabs.Panel>
 
           {/* PRODUCTS */}
@@ -277,7 +314,7 @@ export default function AdminControlCenter() {
 
         </Tabs>
 
-        <Button fullWidth mt="xl" onClick={handleSave}>
+        <Button fullWidth mt="xl" radius="xl" size="md" onClick={handleSave} style={{ background: "var(--primary)", color: "#fff", boxShadow: "var(--shadow-sm)", fontWeight: 700 }}>
           Save All Changes
         </Button>
 
