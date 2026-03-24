@@ -12,22 +12,27 @@ import {
   Group,
   Text,
   Select,
-  ActionIcon, // 🔥 NEW
+  ActionIcon,
+  Progress,
 } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react"; // 🔥 NEW
+import {
+  IconTrash,
+  IconRefresh,
+} from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 
 export default function AdminCreateProduct() {
-  const [imageFile, setImageFile] = useState([]);
-  const [preview, setPreview] = useState([]);
+  const [images, setImages] = useState([]);
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [categories, setCategories] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
@@ -43,15 +48,74 @@ export default function AdminCreateProduct() {
     });
   }, []);
 
-  // 🔥 DELETE IMAGE BEFORE SAVE
-  const handleDeleteImage = (index) => {
-    setImageFile((prev) => prev.filter((_, i) => i !== index));
-    setPreview((prev) => prev.filter((_, i) => i !== index));
+  const handleAddImages = (files) => {
+    if (!files) return;
+
+    const arr = Array.isArray(files) ? files : [files];
+
+    const newImages = arr.map((file) => ({
+      id: URL.createObjectURL(file),
+      file,
+      url: URL.createObjectURL(file),
+      progress: 0,
+      error: false,
+    }));
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleDeleteImage = (id) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
+  };
+
+  const retryUpload = (id) => {
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id ? { ...img, progress: 0, error: false } : img
+      )
+    );
+  };
+
+  const uploadSingle = async (img) => {
+    const formData = new FormData();
+    formData.append("file", img.file);
+
+    try {
+      const res = await api.post("/api/admin/products/upload", formData, {
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+
+          setImages((prev) =>
+            prev.map((i) =>
+              i.id === img.id ? { ...i, progress: percent } : i
+            )
+          );
+        },
+      });
+
+      setImages((prev) =>
+        prev.map((i) =>
+          i.id === img.id ? { ...i, progress: 100 } : i
+        )
+      );
+
+      return res.data.data;
+    } catch {
+      setImages((prev) =>
+        prev.map((i) =>
+          i.id === img.id ? { ...i, error: true } : i
+        )
+      );
+      throw new Error("upload failed");
+    }
   };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      setIsUploading(true);
 
       if (!categoryId) {
         notifications.show({
@@ -62,15 +126,14 @@ export default function AdminCreateProduct() {
         return;
       }
 
-      const uploadedUrls = [];
+      const uploadPromises = images.map((img) => {
+        if (img.error) {
+          throw new Error("Fix failed uploads first");
+        }
+        return uploadSingle(img);
+      });
 
-      for (let file of imageFile) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await api.post("/api/admin/products/upload", formData);
-        uploadedUrls.push(res.data.data);
-      }
+      const uploadedUrls = await Promise.all(uploadPromises);
 
       await api.post("/api/admin/products", {
         name,
@@ -93,20 +156,18 @@ export default function AdminCreateProduct() {
       setPrice("");
       setDescription("");
       setStockQuantity("");
-      setImageFile([]);
-      setPreview([]);
+      setImages([]);
       setCategoryId(null);
 
     } catch (err) {
-      console.error(err);
-
       notifications.show({
         title: "Error",
-        message: "Failed to create product",
+        message: err.message || "Failed to create product",
         color: "red",
       });
     } finally {
       setLoading(false);
+      setIsUploading(false);
     }
   };
 
@@ -119,7 +180,6 @@ export default function AdminCreateProduct() {
       <Paper shadow="xl" radius="lg" p="lg" withBorder>
         <Stack gap="lg">
 
-          {/* PRODUCT INFO */}
           <Paper withBorder p="md" radius="md">
             <Stack>
               <Text fw={600}>Product Information</Text>
@@ -133,7 +193,6 @@ export default function AdminCreateProduct() {
 
               <Select
                 label="Category"
-                placeholder="Select category"
                 data={categories}
                 value={categoryId}
                 onChange={setCategoryId}
@@ -166,49 +225,45 @@ export default function AdminCreateProduct() {
             </Stack>
           </Paper>
 
-          {/* IMAGE UPLOAD */}
           <Paper withBorder p="md" radius="md">
             <Stack>
               <Text fw={600}>Product Images</Text>
 
               <FileInput
-                label="Upload Images"
                 multiple
                 accept="image/*"
-                onChange={(files) => {
-                  if (!files) return;
-
-                  const fileArray = Array.isArray(files) ? files : [files];
-
-                  setImageFile(fileArray);
-                  setPreview(fileArray.map((f) => URL.createObjectURL(f)));
-                }}
+                onChange={handleAddImages}
               />
 
-              {/* 🔥 ENHANCED PREVIEW */}
-              {preview.length > 0 && (
+              {images.length > 0 && (
                 <Group>
-                  {preview.map((img, i) => (
-                    <div key={i} style={{ position: "relative" }}>
-                      <Image
-                        src={img}
-                        width={80}
-                        height={80}
-                        radius="md"
-                      />
+                  {images.map((img) => (
+                    <div key={img.id} style={{ position: "relative" }}>
+                      <Image src={img.url} width={80} height={80} />
 
                       <ActionIcon
                         color="red"
                         size="sm"
-                        style={{
-                          position: "absolute",
-                          top: 2,
-                          right: 2,
-                        }}
-                        onClick={() => handleDeleteImage(i)}
+                        style={{ position: "absolute", top: 2, right: 2 }}
+                        onClick={() => handleDeleteImage(img.id)}
                       >
                         <IconTrash size={14} />
                       </ActionIcon>
+
+                      {img.error ? (
+                        <ActionIcon
+                          color="yellow"
+                          size="sm"
+                          style={{ position: "absolute", bottom: 2, right: 2 }}
+                          onClick={() => retryUpload(img.id)}
+                        >
+                          <IconRefresh size={14} />
+                        </ActionIcon>
+                      ) : (
+                        img.progress > 0 && (
+                          <Progress value={img.progress} size="xs" mt={4} />
+                        )
+                      )}
                     </div>
                   ))}
                 </Group>
@@ -219,11 +274,10 @@ export default function AdminCreateProduct() {
 
           <Button
             loading={loading}
-            size="md"
-            radius="md"
+            disabled={isUploading}
             onClick={handleSubmit}
           >
-            Create Product
+            {isUploading ? "Uploading..." : "Create Product"}
           </Button>
 
         </Stack>

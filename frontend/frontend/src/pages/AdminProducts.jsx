@@ -23,6 +23,7 @@ import {
 import {
   IconTrash,
   IconGripVertical,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
@@ -51,6 +52,8 @@ export default function AdminProducts() {
 
   const [images, setImages] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
+
+  const [isUploading, setIsUploading] = useState(false);
 
   const fetchProducts = () => {
     setLoading(true);
@@ -96,7 +99,6 @@ export default function AdminProducts() {
 
     try {
       await api.delete(`/api/admin/products/${id}`);
-
       setProducts((prev) => prev.filter((p) => p.id !== id));
 
       notifications.show({
@@ -122,6 +124,7 @@ export default function AdminProducts() {
       file,
       url: URL.createObjectURL(file),
       progress: 0,
+      error: false,
     }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -129,6 +132,14 @@ export default function AdminProducts() {
 
   const handleDeleteImage = (id) => {
     setImages((prev) => prev.filter((img) => img.id !== id));
+  };
+
+  const retryUpload = (id) => {
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id ? { ...img, progress: 0, error: false } : img
+      )
+    );
   };
 
   function SortableItem({ item }) {
@@ -179,8 +190,23 @@ export default function AdminProducts() {
           <IconTrash size={14} />
         </ActionIcon>
 
-        {item.type === "local" && item.progress > 0 && (
-          <Progress value={item.progress} size="xs" mt={4} />
+        {item.type === "local" && (
+          <>
+            {item.error ? (
+              <ActionIcon
+                color="yellow"
+                size="sm"
+                style={{ position: "absolute", bottom: 2, right: 2 }}
+                onClick={() => retryUpload(item.id)}
+              >
+                <IconRefresh size={14} />
+              </ActionIcon>
+            ) : (
+              item.progress > 0 && (
+                <Progress value={item.progress} size="xs" mt={4} />
+              )
+            )}
+          </>
         )}
       </div>
     );
@@ -195,40 +221,54 @@ export default function AdminProducts() {
     setImages(arrayMove(images, oldIndex, newIndex));
   };
 
-  // 🚀 UPDATED: progress + parallel upload
+  const uploadSingle = async (img) => {
+    const formData = new FormData();
+    formData.append("file", img.file);
+
+    try {
+      const res = await api.post("/api/admin/products/upload", formData, {
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+
+          setImages((prev) =>
+            prev.map((i) =>
+              i.id === img.id ? { ...i, progress: percent } : i
+            )
+          );
+        },
+      });
+
+      setImages((prev) =>
+        prev.map((i) =>
+          i.id === img.id ? { ...i, progress: 100 } : i
+        )
+      );
+
+      return res.data.data;
+    } catch {
+      setImages((prev) =>
+        prev.map((i) =>
+          i.id === img.id ? { ...i, error: true } : i
+        )
+      );
+      throw new Error("upload failed");
+    }
+  };
+
   const handleUpdate = async () => {
     try {
+      setIsUploading(true);
+
       const uploadPromises = images.map((img) => {
         if (img.type === "server") {
           return Promise.resolve(img.url);
         }
-
-        const formData = new FormData();
-        formData.append("file", img.file);
-
-        return api
-          .post("/api/admin/products/upload", formData, {
-            onUploadProgress: (progressEvent) => {
-              const percent = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-
-              setImages((prev) =>
-                prev.map((i) =>
-                  i.id === img.id ? { ...i, progress: percent } : i
-                )
-              );
-            },
-          })
-          .then((res) => {
-            setImages((prev) =>
-              prev.map((i) =>
-                i.id === img.id ? { ...i, progress: 100 } : i
-              )
-            );
-
-            return res.data.data;
-          });
+        if (img.error) {
+          throw new Error("Fix failed uploads first");
+        }
+        return uploadSingle(img);
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
@@ -251,12 +291,14 @@ export default function AdminProducts() {
 
       setOpened(false);
       fetchProducts();
-    } catch {
+    } catch (err) {
       notifications.show({
         title: "Error",
-        message: "Update failed",
+        message: err.message || "Update failed",
         color: "red",
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -356,7 +398,9 @@ export default function AdminProducts() {
 
           <FileInput multiple onChange={handleAddImages} />
 
-          <Button onClick={handleUpdate}>Save Changes</Button>
+          <Button onClick={handleUpdate} disabled={isUploading}>
+            {isUploading ? "Uploading..." : "Save Changes"}
+          </Button>
 
         </Stack>
       </Modal>
